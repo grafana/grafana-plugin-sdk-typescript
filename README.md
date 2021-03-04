@@ -42,7 +42,7 @@ To make migration of your frontend-only datasource plugin as simple as possible,
 backend: true,
 executable: "gpx_<identifier>",
 ```
-2. Add the dependency to your package json and install `"@grafana/tsbackend": "srclosson/grafana-tsbackend"`
+2. Add the dependency to your package json and install `"@grafana/tsbackend": "grafana/grafana-plugin-sdk-typescript"`
 3. Create a directory called `shared` and moves your `types.ts` file to shared.
 4. In the root of your plugin `cp node_modules/@grafana/tsbackend/tsconfig.backend.json .` to get the backend typescript compiler configuration for the backend.
 5. Create a directory called `backend` and then `cp node_modules@grafana/tsbackend/skel/*.ts backend/` to copy the skeleton files for the typescript backend.
