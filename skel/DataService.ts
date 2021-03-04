@@ -1,12 +1,12 @@
-import { QueryDataRequest, DataFrame, DataService } from '@grafana/tsbackend';
+import { DataFrame, DataService, DataRequest } from '@grafana/tsbackend';
 import { FieldType, ArrayVector } from '@grafana/data';
 
-export class GithubDataService extends DataService {
+export class TemplateDataService extends DataService {
   constructor() {
     super();
   }
 
-  QueryData(request: QueryDataRequest): Promise<DataFrame[]> {
+  QueryData(request: DataRequest<T>): Promise<DataFrame[]> {
     return Promise.resolve([{
       name: 'some data',
       fields: [{

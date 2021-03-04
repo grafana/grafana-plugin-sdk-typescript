@@ -1,11 +1,11 @@
 import { BackendServer } from '@grafana/tsbackend';
-import { GithubDiagnosticsService } from './DiagnosticsService';
-import { GithubDataService } from './DataService';
-import { GithubResourceService } from './ResourceService';
+import { TemplateDiagnosticsService } from './DiagnosticsService';
+import { TemplateDataService } from './DataService';
+import { TemplateResourceService } from './ResourceService';
 
 const app = new BackendServer();
-app.addDiagnosticsService(new GithubDiagnosticsService());
-app.addDataService(new GithubDataService());
-app.addResourceService(new GithubResourceService());
+app.addDiagnosticsService(new TemplateDiagnosticsService());
+app.addDataService(new TemplateDataService());
+app.addResourceService(new TemplateResourceService());
 
 module.exports = app;

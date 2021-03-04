@@ -13,6 +13,7 @@ import {
   CallResourceRequest,
   CallResourceResponse,
   DataResponse,
+  DataQuery,
 } from './proto/backend_pb';
 import * as grpc from 'grpc';
 import { Logger } from './logging';
@@ -84,8 +85,12 @@ export abstract class DiagnosticsService implements proto.IDiagnosticsServer {
   };
 }
 
-export abstract class DataService implements proto.IDataServer {
-  abstract QueryData(request: QueryDataRequest): Promise<DataFrame[]>;
+export interface DataRequest<T> extends DataQuery.AsObject {
+  query: T
+}
+
+export abstract class DataService<T> implements proto.IDataServer {
+  abstract QueryData(request: DataRequest<T>): Promise<DataFrame[]>;
 
   async queryData(call: grpc.ServerUnaryCall<QueryDataRequest>, callback: grpc.sendUnaryData<QueryDataResponse>) {
     const request: QueryDataRequest.AsObject = call.request.toObject();
@@ -96,7 +101,12 @@ export abstract class DataService implements proto.IDataServer {
       if (request.plugincontext?.datasourceinstancesettings) {
         for (let query of request.queriesList) {
           const dataResponse: DataResponse = new DataResponse();
-          const dataFrames: DataFrame[] = await this.QueryData(call.request);
+          const jsonString: string = Buffer.from(query.json as string, 'base64').toString('ascii');
+          const queryAsT: T = JSON.parse(jsonString);
+          const dataFrames: DataFrame[] = await this.QueryData({
+            ...query,
+            query: queryAsT,
+          });
           dataFrames.forEach((dataFrame: DataFrame) => {
             dataResponse.addFrames(grafanaDataFrameToArrowTable(dataFrame).serialize());
           });

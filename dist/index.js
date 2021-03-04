@@ -76,7 +76,9 @@ class DataService {
                 if ((_a = request.plugincontext) === null || _a === void 0 ? void 0 : _a.datasourceinstancesettings) {
                     for (let query of request.queriesList) {
                         const dataResponse = new backend_pb_1.DataResponse();
-                        const dataFrames = yield this.QueryData(call.request);
+                        const jsonString = Buffer.from(query.json, 'base64').toString('ascii');
+                        const queryAsT = JSON.parse(jsonString);
+                        const dataFrames = yield this.QueryData(Object.assign(Object.assign({}, query), { query: queryAsT }));
                         dataFrames.forEach((dataFrame) => {
                             dataResponse.addFrames(data_1.grafanaDataFrameToArrowTable(dataFrame).serialize());
                         });

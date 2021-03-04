@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 import { DataFrame } from '@grafana/data';
 import * as proto from './proto/backend_grpc_pb';
-import { CheckHealthRequest, CheckHealthResponse, QueryDataRequest, QueryDataResponse, DataSourceInstanceSettings, CollectMetricsRequest, CollectMetricsResponse, CallResourceRequest, CallResourceResponse } from './proto/backend_pb';
+import { CheckHealthRequest, CheckHealthResponse, QueryDataRequest, QueryDataResponse, DataSourceInstanceSettings, CollectMetricsRequest, CollectMetricsResponse, CallResourceRequest, CallResourceResponse, DataQuery } from './proto/backend_pb';
 import * as grpc from 'grpc';
 import { Logger } from './logging';
 import { API } from './api';
@@ -19,8 +19,11 @@ export declare abstract class DiagnosticsService implements proto.IDiagnosticsSe
     checkHealth: (call: grpc.ServerUnaryCall<CheckHealthRequest>, callback: grpc.sendUnaryData<CheckHealthResponse>) => Promise<void>;
     collectMetrics: (call: grpc.ServerUnaryCall<CollectMetricsRequest>, callback: grpc.sendUnaryData<CollectMetricsResponse>) => Promise<void>;
 }
-export declare abstract class DataService implements proto.IDataServer {
-    abstract QueryData(request: QueryDataRequest): Promise<DataFrame[]>;
+export interface DataRequest<T> extends DataQuery.AsObject {
+    query: T;
+}
+export declare abstract class DataService<T> implements proto.IDataServer {
+    abstract QueryData(request: DataRequest<T>): Promise<DataFrame[]>;
     queryData(call: grpc.ServerUnaryCall<QueryDataRequest>, callback: grpc.sendUnaryData<QueryDataResponse>): Promise<void>;
 }
 export declare abstract class ResourceService implements proto.IResourceServer {
