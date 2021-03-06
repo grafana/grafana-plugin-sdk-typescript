@@ -76,7 +76,10 @@ class BackendSrvImpl {
         return request_promise_native_1.default(request).then(response => {
             try {
                 //logger.debug("<==", response);
-                const data = JSON.parse(response);
+                let data = response;
+                if (request.body instanceof Object) {
+                    data = JSON.parse(response);
+                }
                 return Promise.resolve({ data });
             }
             catch (ex) {

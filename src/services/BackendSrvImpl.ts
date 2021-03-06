@@ -94,7 +94,11 @@ export class BackendSrvImpl implements BackendSrv {
     return requestPromise(request).then(response => {
       try {
         //logger.debug("<==", response);
-        const data = JSON.parse(response);
+        let data = response; 
+        if (request.body instanceof Object) {
+          data = JSON.parse(response);
+        }
+        
         return Promise.resolve({ data });
       } catch(ex) {
         return Promise.reject(ex);
