@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.getBackendSrv = exports.setBackendSrv = void 0;
 let singletonInstance;
 function setBackendSrv(instance) {
     singletonInstance = instance;

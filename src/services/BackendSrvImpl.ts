@@ -1,6 +1,7 @@
+import { DataSourceJsonData } from '@grafana/data';
 import { BackendSrv, BackendSrvRequest, BackendSrvResponse } from '../backend_srv';
 import requestPromise from 'request-promise-native';
-import { DataSourceInstanceSettings } from '../proto/backend_pb';
+import { DataSourceInstanceSettings } from '../index';
 import { Logger } from '../logging';
 
 const logger: Logger = new Logger();
@@ -26,7 +27,7 @@ const serializeQueryStringParams = function(obj: any, prefix?: string): string {
  * online data sources.
  */
 export class BackendSrvImpl implements BackendSrv {
-  config: DataSourceInstanceSettings.AsObject;
+  config: DataSourceInstanceSettings<DataSourceJsonData>;
   _headers: any;
 
   /**
@@ -34,7 +35,7 @@ export class BackendSrvImpl implements BackendSrv {
    * @param config A Settings object thta includes both Secure and Insecure settings.
    * @todo Figure out a way to keep the secure options secure, rather than hard coding them. Perhaps from the command line?
    */
-  constructor(config: DataSourceInstanceSettings.AsObject, headers?: any) {
+  constructor(config: DataSourceInstanceSettings<DataSourceJsonData>, headers?: any) {
     this.config = config;
     this._headers = headers || {};
 

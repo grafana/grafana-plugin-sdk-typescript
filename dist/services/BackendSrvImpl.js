@@ -1,5 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.BackendSrvImpl = void 0;
 const tslib_1 = require("tslib");
 const request_promise_native_1 = tslib_1.__importDefault(require("request-promise-native"));
 const logging_1 = require("../logging");

@@ -7,13 +7,14 @@ import {
   CheckHealthResponse,
   QueryDataRequest,
   QueryDataResponse,
-  DataSourceInstanceSettings,
+  DataSourceInstanceSettings as InternalDataSourceInstanceSettings,
   CollectMetricsRequest,
   CollectMetricsResponse,
   CallResourceRequest,
   CallResourceResponse,
   DataResponse,
-  DataQuery,
+  DataQuery as InternalDataQuery,
+  PluginContext as InternalPluginContext,
 } from './proto/backend_pb';
 import * as grpc from 'grpc';
 import { Logger } from './logging';
@@ -24,7 +25,6 @@ export {
   CheckHealthResponse,
   QueryDataRequest,
   QueryDataResponse,
-  DataSourceInstanceSettings,
   CollectMetricsRequest,
   CollectMetricsResponse,
   CallResourceRequest,
@@ -41,7 +41,7 @@ export class ApiConnectionManager {
     this.apiMap = {}
   }
 
-  getAPI(settings: DataSourceInstanceSettings.AsObject): API {
+  getAPI(settings: InternalDataSourceInstanceSettings.AsObject): API {
     if (!this.apiMap[settings.url]) {
       this.apiMap[settings.url] = new API(settings);
     }
@@ -85,15 +85,24 @@ export abstract class DiagnosticsService implements proto.IDiagnosticsServer {
   };
 }
 
-export interface DataRequest<T> extends DataQuery.AsObject {
-  query: T
+export interface DataQuery<T> extends InternalDataQuery.AsObject {
+  query: T;
 }
 
-export abstract class DataService<T> implements proto.IDataServer {
-  abstract QueryData(request: DataRequest<T>): Promise<DataFrame[]>;
+export interface DataSourceInstanceSettings<T> extends InternalDataSourceInstanceSettings.AsObject {
+  json: T;
+}
+
+export interface PluginContext<T> extends InternalPluginContext.AsObject {
+  datasourceinstancesettings?: DataSourceInstanceSettings<T>;
+}
+
+export abstract class DataService<Q,O> implements proto.IDataServer {
+  abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<DataFrame[]>;
 
   async queryData(call: grpc.ServerUnaryCall<QueryDataRequest>, callback: grpc.sendUnaryData<QueryDataResponse>) {
     const request: QueryDataRequest.AsObject = call.request.toObject();
+    const context: InternalPluginContext.AsObject = call.request.toObject().plugincontext!;
     const response: QueryDataResponse = new QueryDataResponse();
     let err: grpc.ServiceError | null = null;
 
@@ -102,10 +111,18 @@ export abstract class DataService<T> implements proto.IDataServer {
         for (let query of request.queriesList) {
           const dataResponse: DataResponse = new DataResponse();
           const jsonString: string = Buffer.from(query.json as string, 'base64').toString('ascii');
-          const queryAsT: T = JSON.parse(jsonString);
+          const queryAsQ: Q = JSON.parse(jsonString);
+          const contextJson: string = Buffer.from(context.datasourceinstancesettings?.jsondata as string, 'base64').toString('ascii');
+          const contextAsO: O = JSON.parse(contextJson);
           const dataFrames: DataFrame[] = await this.QueryData({
             ...query,
-            query: queryAsT,
+            query: queryAsQ,
+          }, {
+            ...context,
+            datasourceinstancesettings: {
+              ...context.datasourceinstancesettings!,
+              json: contextAsO,
+            }
           });
           dataFrames.forEach((dataFrame: DataFrame) => {
             dataResponse.addFrames(grafanaDataFrameToArrowTable(dataFrame).serialize());

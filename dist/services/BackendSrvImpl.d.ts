@@ -1,19 +1,20 @@
+import { DataSourceJsonData } from '@grafana/data';
 import { BackendSrv, BackendSrvRequest, BackendSrvResponse } from '../backend_srv';
-import { DataSourceInstanceSettings } from '../proto/backend_pb';
+import { DataSourceInstanceSettings } from '../index';
 /**
  * AppDynamics
  * Strives to be a generic class that provides a native way to query data from restful
  * online data sources.
  */
 export declare class BackendSrvImpl implements BackendSrv {
-    config: DataSourceInstanceSettings.AsObject;
+    config: DataSourceInstanceSettings<DataSourceJsonData>;
     _headers: any;
     /**
      * Creates a new BackendTestSrv
      * @param config A Settings object thta includes both Secure and Insecure settings.
      * @todo Figure out a way to keep the secure options secure, rather than hard coding them. Perhaps from the command line?
      */
-    constructor(config: DataSourceInstanceSettings.AsObject, headers?: any);
+    constructor(config: DataSourceInstanceSettings<DataSourceJsonData>, headers?: any);
     get(url: string, params?: any): Promise<any>;
     delete(url: string): Promise<any>;
     post(uri: string, body: any, data?: any): Promise<any>;

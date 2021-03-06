@@ -1,27 +1,27 @@
 #!/usr/bin/env node
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
+exports.Logger = exports.logger = exports.BackendServer = exports.ResourceService = exports.DataService = exports.DiagnosticsService = exports.ApiConnectionManager = exports.BackendSrvImpl = exports.DataResponse = exports.CallResourceResponse = exports.CallResourceRequest = exports.CollectMetricsResponse = exports.CollectMetricsRequest = exports.QueryDataResponse = exports.QueryDataRequest = exports.CheckHealthResponse = exports.CheckHealthRequest = void 0;
 const tslib_1 = require("tslib");
 const data_1 = require("@grafana/data");
 const proto = tslib_1.__importStar(require("./proto/backend_grpc_pb"));
 const backend_pb_1 = require("./proto/backend_pb");
 const grpc = tslib_1.__importStar(require("grpc"));
 const logging_1 = require("./logging");
-exports.Logger = logging_1.Logger;
+Object.defineProperty(exports, "Logger", { enumerable: true, get: function () { return logging_1.Logger; } });
 const api_1 = require("./api");
 var backend_pb_2 = require("./proto/backend_pb");
-exports.CheckHealthRequest = backend_pb_2.CheckHealthRequest;
-exports.CheckHealthResponse = backend_pb_2.CheckHealthResponse;
-exports.QueryDataRequest = backend_pb_2.QueryDataRequest;
-exports.QueryDataResponse = backend_pb_2.QueryDataResponse;
-exports.DataSourceInstanceSettings = backend_pb_2.DataSourceInstanceSettings;
-exports.CollectMetricsRequest = backend_pb_2.CollectMetricsRequest;
-exports.CollectMetricsResponse = backend_pb_2.CollectMetricsResponse;
-exports.CallResourceRequest = backend_pb_2.CallResourceRequest;
-exports.CallResourceResponse = backend_pb_2.CallResourceResponse;
-exports.DataResponse = backend_pb_2.DataResponse;
+Object.defineProperty(exports, "CheckHealthRequest", { enumerable: true, get: function () { return backend_pb_2.CheckHealthRequest; } });
+Object.defineProperty(exports, "CheckHealthResponse", { enumerable: true, get: function () { return backend_pb_2.CheckHealthResponse; } });
+Object.defineProperty(exports, "QueryDataRequest", { enumerable: true, get: function () { return backend_pb_2.QueryDataRequest; } });
+Object.defineProperty(exports, "QueryDataResponse", { enumerable: true, get: function () { return backend_pb_2.QueryDataResponse; } });
+Object.defineProperty(exports, "CollectMetricsRequest", { enumerable: true, get: function () { return backend_pb_2.CollectMetricsRequest; } });
+Object.defineProperty(exports, "CollectMetricsResponse", { enumerable: true, get: function () { return backend_pb_2.CollectMetricsResponse; } });
+Object.defineProperty(exports, "CallResourceRequest", { enumerable: true, get: function () { return backend_pb_2.CallResourceRequest; } });
+Object.defineProperty(exports, "CallResourceResponse", { enumerable: true, get: function () { return backend_pb_2.CallResourceResponse; } });
+Object.defineProperty(exports, "DataResponse", { enumerable: true, get: function () { return backend_pb_2.DataResponse; } });
 const BackendSrvImpl_1 = require("./services/BackendSrvImpl");
-exports.BackendSrvImpl = BackendSrvImpl_1.BackendSrvImpl;
+Object.defineProperty(exports, "BackendSrvImpl", { enumerable: true, get: function () { return BackendSrvImpl_1.BackendSrvImpl; } });
 class ApiConnectionManager {
     constructor() {
         this.apiMap = {};
@@ -67,9 +67,10 @@ class DiagnosticsService {
 exports.DiagnosticsService = DiagnosticsService;
 class DataService {
     queryData(call, callback) {
-        var _a;
+        var _a, _b;
         return tslib_1.__awaiter(this, void 0, void 0, function* () {
             const request = call.request.toObject();
+            const context = call.request.toObject().plugincontext;
             const response = new backend_pb_1.QueryDataResponse();
             let err = null;
             try {
@@ -77,8 +78,10 @@ class DataService {
                     for (let query of request.queriesList) {
                         const dataResponse = new backend_pb_1.DataResponse();
                         const jsonString = Buffer.from(query.json, 'base64').toString('ascii');
-                        const queryAsT = JSON.parse(jsonString);
-                        const dataFrames = yield this.QueryData(Object.assign(Object.assign({}, query), { query: queryAsT }));
+                        const queryAsQ = JSON.parse(jsonString);
+                        const contextJson = Buffer.from((_b = context.datasourceinstancesettings) === null || _b === void 0 ? void 0 : _b.jsondata, 'base64').toString('ascii');
+                        const contextAsO = JSON.parse(contextJson);
+                        const dataFrames = yield this.QueryData(Object.assign(Object.assign({}, query), { query: queryAsQ }), Object.assign(Object.assign({}, context), { datasourceinstancesettings: Object.assign(Object.assign({}, context.datasourceinstancesettings), { json: contextAsO }) }));
                         dataFrames.forEach((dataFrame) => {
                             dataResponse.addFrames(data_1.grafanaDataFrameToArrowTable(dataFrame).serialize());
                         });
