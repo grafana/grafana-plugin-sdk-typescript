@@ -37,6 +37,7 @@
     "@grafana/tsconfig": "^1.0.0-rc1",
     "request-promise-native": "1.0.8",
     "@types/request-promise-native": "1.0.14",
+    "pkg": "4.5.0",
     "tslib": "2.1.0"
   },
   "engines": {
