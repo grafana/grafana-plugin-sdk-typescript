@@ -40,7 +40,8 @@
   },
   "dependencies": {
     "typescript": "4.2.2",
-    "pkg": "4.5.0"
+    "pkg": "4.5.0",
+    "nexe": "3.3.3"
   },
   "engines": {
     "node": ">=12 <=14"

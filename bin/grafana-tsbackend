@@ -8,14 +8,17 @@ $BASEDIR/node_modules/.bin/tsc --project tsconfig.backend.json
 EXEC=$(grep "executable" dist/plugin.json | sed -E 's/"executable":[ \t]+"(.*)",/\1/' | tr -d ' ' | tr -d '\n')
 OS=$(uname -s |  tr '[:upper:]' '[:lower:]' | tr -d '\n')
 ARCH="amd64"
+OS="linux"
 FILENAME="dist/${EXEC}_${OS}_${ARCH}"
 # put out a script that runs the backend
-cat <<'EOF' > $FILE_DEST
+cat <<'EOF' > "${FILE_DEST}"
 #!/usr/bin/env node
 "use strict";
 const app = require("./backend/index");
 app.run();
 EOF
-chmod 755 "$FILE_DEST"
+chmod 755 "${FILE_DEST}"
 
-$BASEDIR/node_modules/.bin/pkg $FILE_DEST -o $FILENAME
+#$BASEDIR/node_modules/.bin/pkg $FILE_DEST -t linux -o $FILENAME
+#$BASEDIR/node_modules/.bin/nexe "${FILE_DEST}" -t linux-x64-14.15.3 -o "${FILENAME}"
+mv "${FILE_DEST}" "${FILENAME}"
