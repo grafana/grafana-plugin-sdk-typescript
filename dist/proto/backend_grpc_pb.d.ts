@@ -108,63 +108,63 @@ export class DiagnosticsClient extends grpc.Client implements IDiagnosticsClient
   public collectMetrics(request: backend_pb.CollectMetricsRequest, metadata: grpc.Metadata, callback: (error: Error | null, response: backend_pb.CollectMetricsResponse) => void): grpc.ClientUnaryCall;
 }
 
-interface ITransformService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
-  transformData: ITransformService_ITransformData;
+interface IStreamService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
+  subscribeStream: IStreamService_ISubscribeStream;
+  runStream: IStreamService_IRunStream;
+  publishStream: IStreamService_IPublishStream;
 }
 
-interface ITransformService_ITransformData {
-  path: string; // "/pluginv2.Transform/TransformData"
+interface IStreamService_ISubscribeStream {
+  path: string; // "/pluginv2.Stream/SubscribeStream"
   requestStream: boolean; // false
   responseStream: boolean; // false
-  requestSerialize: grpc.serialize<backend_pb.QueryDataRequest>;
-  requestDeserialize: grpc.deserialize<backend_pb.QueryDataRequest>;
-  responseSerialize: grpc.serialize<backend_pb.QueryDataResponse>;
-  responseDeserialize: grpc.deserialize<backend_pb.QueryDataResponse>;
+  requestSerialize: grpc.serialize<backend_pb.SubscribeStreamRequest>;
+  requestDeserialize: grpc.deserialize<backend_pb.SubscribeStreamRequest>;
+  responseSerialize: grpc.serialize<backend_pb.SubscribeStreamResponse>;
+  responseDeserialize: grpc.deserialize<backend_pb.SubscribeStreamResponse>;
 }
 
-export const TransformService: ITransformService;
-export interface ITransformServer {
-  transformData: grpc.handleUnaryCall<backend_pb.QueryDataRequest, backend_pb.QueryDataResponse>;
+interface IStreamService_IRunStream {
+  path: string; // "/pluginv2.Stream/RunStream"
+  requestStream: boolean; // false
+  responseStream: boolean; // true
+  requestSerialize: grpc.serialize<backend_pb.RunStreamRequest>;
+  requestDeserialize: grpc.deserialize<backend_pb.RunStreamRequest>;
+  responseSerialize: grpc.serialize<backend_pb.StreamPacket>;
+  responseDeserialize: grpc.deserialize<backend_pb.StreamPacket>;
 }
 
-export interface ITransformClient {
-  transformData(request: backend_pb.QueryDataRequest, callback: (error: Error | null, response: backend_pb.QueryDataResponse) => void): grpc.ClientUnaryCall;
-  transformData(request: backend_pb.QueryDataRequest, metadata: grpc.Metadata, callback: (error: Error | null, response: backend_pb.QueryDataResponse) => void): grpc.ClientUnaryCall;
-}
-
-export class TransformClient extends grpc.Client implements ITransformClient {
-  constructor(address: string, credentials: grpc.ChannelCredentials, options?: object);
-  public transformData(request: backend_pb.QueryDataRequest, callback: (error: Error | null, response: backend_pb.QueryDataResponse) => void): grpc.ClientUnaryCall;
-  public transformData(request: backend_pb.QueryDataRequest, metadata: grpc.Metadata, callback: (error: Error | null, response: backend_pb.QueryDataResponse) => void): grpc.ClientUnaryCall;
-}
-
-interface ITransformDataCallBackService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
-  queryData: ITransformDataCallBackService_IQueryData;
-}
-
-interface ITransformDataCallBackService_IQueryData {
-  path: string; // "/pluginv2.TransformDataCallBack/QueryData"
+interface IStreamService_IPublishStream {
+  path: string; // "/pluginv2.Stream/PublishStream"
   requestStream: boolean; // false
   responseStream: boolean; // false
-  requestSerialize: grpc.serialize<backend_pb.QueryDataRequest>;
-  requestDeserialize: grpc.deserialize<backend_pb.QueryDataRequest>;
-  responseSerialize: grpc.serialize<backend_pb.QueryDataResponse>;
-  responseDeserialize: grpc.deserialize<backend_pb.QueryDataResponse>;
+  requestSerialize: grpc.serialize<backend_pb.PublishStreamRequest>;
+  requestDeserialize: grpc.deserialize<backend_pb.PublishStreamRequest>;
+  responseSerialize: grpc.serialize<backend_pb.PublishStreamResponse>;
+  responseDeserialize: grpc.deserialize<backend_pb.PublishStreamResponse>;
 }
 
-export const TransformDataCallBackService: ITransformDataCallBackService;
-export interface ITransformDataCallBackServer {
-  queryData: grpc.handleUnaryCall<backend_pb.QueryDataRequest, backend_pb.QueryDataResponse>;
+export const StreamService: IStreamService;
+export interface IStreamServer {
+  subscribeStream: grpc.handleUnaryCall<backend_pb.SubscribeStreamRequest, backend_pb.SubscribeStreamResponse>;
+  runStream: grpc.handleServerStreamingCall<backend_pb.RunStreamRequest, backend_pb.StreamPacket>;
+  publishStream: grpc.handleUnaryCall<backend_pb.PublishStreamRequest, backend_pb.PublishStreamResponse>;
 }
 
-export interface ITransformDataCallBackClient {
-  queryData(request: backend_pb.QueryDataRequest, callback: (error: Error | null, response: backend_pb.QueryDataResponse) => void): grpc.ClientUnaryCall;
-  queryData(request: backend_pb.QueryDataRequest, metadata: grpc.Metadata, callback: (error: Error | null, response: backend_pb.QueryDataResponse) => void): grpc.ClientUnaryCall;
+export interface IStreamClient {
+  subscribeStream(request: backend_pb.SubscribeStreamRequest, callback: (error: Error | null, response: backend_pb.SubscribeStreamResponse) => void): grpc.ClientUnaryCall;
+  subscribeStream(request: backend_pb.SubscribeStreamRequest, metadata: grpc.Metadata, callback: (error: Error | null, response: backend_pb.SubscribeStreamResponse) => void): grpc.ClientUnaryCall;
+  runStream(request: backend_pb.RunStreamRequest, metadata?: grpc.Metadata): grpc.ClientReadableStream<backend_pb.StreamPacket>;
+  publishStream(request: backend_pb.PublishStreamRequest, callback: (error: Error | null, response: backend_pb.PublishStreamResponse) => void): grpc.ClientUnaryCall;
+  publishStream(request: backend_pb.PublishStreamRequest, metadata: grpc.Metadata, callback: (error: Error | null, response: backend_pb.PublishStreamResponse) => void): grpc.ClientUnaryCall;
 }
 
-export class TransformDataCallBackClient extends grpc.Client implements ITransformDataCallBackClient {
+export class StreamClient extends grpc.Client implements IStreamClient {
   constructor(address: string, credentials: grpc.ChannelCredentials, options?: object);
-  public queryData(request: backend_pb.QueryDataRequest, callback: (error: Error | null, response: backend_pb.QueryDataResponse) => void): grpc.ClientUnaryCall;
-  public queryData(request: backend_pb.QueryDataRequest, metadata: grpc.Metadata, callback: (error: Error | null, response: backend_pb.QueryDataResponse) => void): grpc.ClientUnaryCall;
+  public subscribeStream(request: backend_pb.SubscribeStreamRequest, callback: (error: Error | null, response: backend_pb.SubscribeStreamResponse) => void): grpc.ClientUnaryCall;
+  public subscribeStream(request: backend_pb.SubscribeStreamRequest, metadata: grpc.Metadata, callback: (error: Error | null, response: backend_pb.SubscribeStreamResponse) => void): grpc.ClientUnaryCall;
+  public runStream(request: backend_pb.RunStreamRequest, metadata?: grpc.Metadata): grpc.ClientReadableStream<backend_pb.StreamPacket>;
+  public publishStream(request: backend_pb.PublishStreamRequest, callback: (error: Error | null, response: backend_pb.PublishStreamResponse) => void): grpc.ClientUnaryCall;
+  public publishStream(request: backend_pb.PublishStreamRequest, metadata: grpc.Metadata, callback: (error: Error | null, response: backend_pb.PublishStreamResponse) => void): grpc.ClientUnaryCall;
 }
 

@@ -64,6 +64,9 @@ export class DataSourceInstanceSettings extends jspb.Message {
   getLastupdatedms(): number;
   setLastupdatedms(value: number): void;
 
+  getUid(): string;
+  setUid(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): DataSourceInstanceSettings.AsObject;
   static toObject(includeInstance: boolean, msg: DataSourceInstanceSettings): DataSourceInstanceSettings.AsObject;
@@ -86,6 +89,7 @@ export namespace DataSourceInstanceSettings {
     jsondata: Uint8Array | string,
     decryptedsecurejsondataMap: Array<[string, string]>,
     lastupdatedms: number,
+    uid: string,
   }
 }
 
@@ -530,6 +534,176 @@ export namespace CheckHealthResponse {
     UNKNOWN = 0,
     OK = 1,
     ERROR = 2,
+  }
+}
+
+export class SubscribeStreamRequest extends jspb.Message {
+  hasPlugincontext(): boolean;
+  clearPlugincontext(): void;
+  getPlugincontext(): PluginContext | undefined;
+  setPlugincontext(value?: PluginContext): void;
+
+  getPath(): string;
+  setPath(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SubscribeStreamRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: SubscribeStreamRequest): SubscribeStreamRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: SubscribeStreamRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SubscribeStreamRequest;
+  static deserializeBinaryFromReader(message: SubscribeStreamRequest, reader: jspb.BinaryReader): SubscribeStreamRequest;
+}
+
+export namespace SubscribeStreamRequest {
+  export type AsObject = {
+    plugincontext?: PluginContext.AsObject,
+    path: string,
+  }
+}
+
+export class SubscribeStreamResponse extends jspb.Message {
+  getStatus(): SubscribeStreamResponse.Status;
+  setStatus(value: SubscribeStreamResponse.Status): void;
+
+  getData(): Uint8Array | string;
+  getData_asU8(): Uint8Array;
+  getData_asB64(): string;
+  setData(value: Uint8Array | string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): SubscribeStreamResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: SubscribeStreamResponse): SubscribeStreamResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: SubscribeStreamResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): SubscribeStreamResponse;
+  static deserializeBinaryFromReader(message: SubscribeStreamResponse, reader: jspb.BinaryReader): SubscribeStreamResponse;
+}
+
+export namespace SubscribeStreamResponse {
+  export type AsObject = {
+    status: SubscribeStreamResponse.Status,
+    data: Uint8Array | string,
+  }
+
+  export enum Status {
+    OK = 0,
+    NOT_FOUND = 1,
+    PERMISSION_DENIED = 2,
+  }
+}
+
+export class PublishStreamRequest extends jspb.Message {
+  hasPlugincontext(): boolean;
+  clearPlugincontext(): void;
+  getPlugincontext(): PluginContext | undefined;
+  setPlugincontext(value?: PluginContext): void;
+
+  getPath(): string;
+  setPath(value: string): void;
+
+  getData(): Uint8Array | string;
+  getData_asU8(): Uint8Array;
+  getData_asB64(): string;
+  setData(value: Uint8Array | string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PublishStreamRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: PublishStreamRequest): PublishStreamRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: PublishStreamRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PublishStreamRequest;
+  static deserializeBinaryFromReader(message: PublishStreamRequest, reader: jspb.BinaryReader): PublishStreamRequest;
+}
+
+export namespace PublishStreamRequest {
+  export type AsObject = {
+    plugincontext?: PluginContext.AsObject,
+    path: string,
+    data: Uint8Array | string,
+  }
+}
+
+export class PublishStreamResponse extends jspb.Message {
+  getStatus(): PublishStreamResponse.Status;
+  setStatus(value: PublishStreamResponse.Status): void;
+
+  getData(): Uint8Array | string;
+  getData_asU8(): Uint8Array;
+  getData_asB64(): string;
+  setData(value: Uint8Array | string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): PublishStreamResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: PublishStreamResponse): PublishStreamResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: PublishStreamResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): PublishStreamResponse;
+  static deserializeBinaryFromReader(message: PublishStreamResponse, reader: jspb.BinaryReader): PublishStreamResponse;
+}
+
+export namespace PublishStreamResponse {
+  export type AsObject = {
+    status: PublishStreamResponse.Status,
+    data: Uint8Array | string,
+  }
+
+  export enum Status {
+    OK = 0,
+    NOT_FOUND = 1,
+    PERMISSION_DENIED = 2,
+  }
+}
+
+export class RunStreamRequest extends jspb.Message {
+  hasPlugincontext(): boolean;
+  clearPlugincontext(): void;
+  getPlugincontext(): PluginContext | undefined;
+  setPlugincontext(value?: PluginContext): void;
+
+  getPath(): string;
+  setPath(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): RunStreamRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: RunStreamRequest): RunStreamRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: RunStreamRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): RunStreamRequest;
+  static deserializeBinaryFromReader(message: RunStreamRequest, reader: jspb.BinaryReader): RunStreamRequest;
+}
+
+export namespace RunStreamRequest {
+  export type AsObject = {
+    plugincontext?: PluginContext.AsObject,
+    path: string,
+  }
+}
+
+export class StreamPacket extends jspb.Message {
+  getData(): Uint8Array | string;
+  getData_asU8(): Uint8Array;
+  getData_asB64(): string;
+  setData(value: Uint8Array | string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): StreamPacket.AsObject;
+  static toObject(includeInstance: boolean, msg: StreamPacket): StreamPacket.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: StreamPacket, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): StreamPacket;
+  static deserializeBinaryFromReader(message: StreamPacket, reader: jspb.BinaryReader): StreamPacket;
+}
+
+export namespace StreamPacket {
+  export type AsObject = {
+    data: Uint8Array | string,
   }
 }
 

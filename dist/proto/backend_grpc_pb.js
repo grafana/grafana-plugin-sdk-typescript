@@ -70,6 +70,28 @@ function deserialize_pluginv2_CollectMetricsResponse(buffer_arg) {
   return backend_pb.CollectMetricsResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_pluginv2_PublishStreamRequest(arg) {
+  if (!(arg instanceof backend_pb.PublishStreamRequest)) {
+    throw new Error('Expected argument of type pluginv2.PublishStreamRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_PublishStreamRequest(buffer_arg) {
+  return backend_pb.PublishStreamRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_pluginv2_PublishStreamResponse(arg) {
+  if (!(arg instanceof backend_pb.PublishStreamResponse)) {
+    throw new Error('Expected argument of type pluginv2.PublishStreamResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_PublishStreamResponse(buffer_arg) {
+  return backend_pb.PublishStreamResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_pluginv2_QueryDataRequest(arg) {
   if (!(arg instanceof backend_pb.QueryDataRequest)) {
     throw new Error('Expected argument of type pluginv2.QueryDataRequest');
@@ -90,6 +112,50 @@ function serialize_pluginv2_QueryDataResponse(arg) {
 
 function deserialize_pluginv2_QueryDataResponse(buffer_arg) {
   return backend_pb.QueryDataResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_pluginv2_RunStreamRequest(arg) {
+  if (!(arg instanceof backend_pb.RunStreamRequest)) {
+    throw new Error('Expected argument of type pluginv2.RunStreamRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_RunStreamRequest(buffer_arg) {
+  return backend_pb.RunStreamRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_pluginv2_StreamPacket(arg) {
+  if (!(arg instanceof backend_pb.StreamPacket)) {
+    throw new Error('Expected argument of type pluginv2.StreamPacket');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_StreamPacket(buffer_arg) {
+  return backend_pb.StreamPacket.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_pluginv2_SubscribeStreamRequest(arg) {
+  if (!(arg instanceof backend_pb.SubscribeStreamRequest)) {
+    throw new Error('Expected argument of type pluginv2.SubscribeStreamRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_SubscribeStreamRequest(buffer_arg) {
+  return backend_pb.SubscribeStreamRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_pluginv2_SubscribeStreamResponse(arg) {
+  if (!(arg instanceof backend_pb.SubscribeStreamResponse)) {
+    throw new Error('Expected argument of type pluginv2.SubscribeStreamResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_SubscribeStreamResponse(buffer_arg) {
+  return backend_pb.SubscribeStreamResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 
@@ -161,37 +227,56 @@ var DiagnosticsService = exports.DiagnosticsService = {
 };
 
 exports.DiagnosticsClient = grpc.makeGenericClientConstructor(DiagnosticsService);
-// -----------------------------------------------
-// Transform - Very experimental
-// -----------------------------------------------
+// -----------------------------------------------------------------
+// Stream -- EXPERIMENTAL and is subject to change until 8.0
+// -----------------------------------------------------------------
 //
-var TransformService = exports.TransformService = {
-  transformData: {
-    path: '/pluginv2.Transform/TransformData',
+var StreamService = exports.StreamService = {
+  // SubscribeStream called when a user tries to subscribe to a plugin/datasource
+  // managed channel path – thus plugin can check subscribe permissions and communicate
+  // options with Grafana Core. When the first subscriber joins a channel, RunStream
+  // will be called. 
+  subscribeStream: {
+    path: '/pluginv2.Stream/SubscribeStream',
     requestStream: false,
     responseStream: false,
-    requestType: backend_pb.QueryDataRequest,
-    responseType: backend_pb.QueryDataResponse,
-    requestSerialize: serialize_pluginv2_QueryDataRequest,
-    requestDeserialize: deserialize_pluginv2_QueryDataRequest,
-    responseSerialize: serialize_pluginv2_QueryDataResponse,
-    responseDeserialize: deserialize_pluginv2_QueryDataResponse,
+    requestType: backend_pb.SubscribeStreamRequest,
+    responseType: backend_pb.SubscribeStreamResponse,
+    requestSerialize: serialize_pluginv2_SubscribeStreamRequest,
+    requestDeserialize: deserialize_pluginv2_SubscribeStreamRequest,
+    responseSerialize: serialize_pluginv2_SubscribeStreamResponse,
+    responseDeserialize: deserialize_pluginv2_SubscribeStreamResponse,
+  },
+  // RunStream will be initiated by Grafana to consume a stream. RunStream will be
+  // called once for the first client successfully subscribed to a channel path.
+  // When Grafana detects that there are no longer any subscribers inside a channel,
+  // the call will be terminated until next active subscriber appears. Call termination
+  // can happen with a delay.
+  runStream: {
+    path: '/pluginv2.Stream/RunStream',
+    requestStream: false,
+    responseStream: true,
+    requestType: backend_pb.RunStreamRequest,
+    responseType: backend_pb.StreamPacket,
+    requestSerialize: serialize_pluginv2_RunStreamRequest,
+    requestDeserialize: deserialize_pluginv2_RunStreamRequest,
+    responseSerialize: serialize_pluginv2_StreamPacket,
+    responseDeserialize: deserialize_pluginv2_StreamPacket,
+  },
+  // PublishStream called when a user tries to publish to a plugin/datasource
+  // managed channel path. Here plugin can check publish permissions and
+  // modify publication data if required.
+  publishStream: {
+    path: '/pluginv2.Stream/PublishStream',
+    requestStream: false,
+    responseStream: false,
+    requestType: backend_pb.PublishStreamRequest,
+    responseType: backend_pb.PublishStreamResponse,
+    requestSerialize: serialize_pluginv2_PublishStreamRequest,
+    requestDeserialize: deserialize_pluginv2_PublishStreamRequest,
+    responseSerialize: serialize_pluginv2_PublishStreamResponse,
+    responseDeserialize: deserialize_pluginv2_PublishStreamResponse,
   },
 };
 
-exports.TransformClient = grpc.makeGenericClientConstructor(TransformService);
-var TransformDataCallBackService = exports.TransformDataCallBackService = {
-  queryData: {
-    path: '/pluginv2.TransformDataCallBack/QueryData',
-    requestStream: false,
-    responseStream: false,
-    requestType: backend_pb.QueryDataRequest,
-    responseType: backend_pb.QueryDataResponse,
-    requestSerialize: serialize_pluginv2_QueryDataRequest,
-    requestDeserialize: deserialize_pluginv2_QueryDataRequest,
-    responseSerialize: serialize_pluginv2_QueryDataResponse,
-    responseDeserialize: deserialize_pluginv2_QueryDataResponse,
-  },
-};
-
-exports.TransformDataCallBackClient = grpc.makeGenericClientConstructor(TransformDataCallBackService);
+exports.StreamClient = grpc.makeGenericClientConstructor(StreamService);

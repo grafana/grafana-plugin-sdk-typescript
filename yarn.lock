@@ -10929,10 +10929,10 @@ protobufjs@^5.0.3:
     glob "^7.0.5"
     yargs "^3.10.0"
 
-protoc-gen-grpc@1.4.0:
-  version "1.4.0"
-  resolved "https://registry.yarnpkg.com/protoc-gen-grpc/-/protoc-gen-grpc-1.4.0.tgz#65c7a929794948a1525b31d888925599b178fd3e"
-  integrity sha512-S9cQCT97NBS0IIOOaZDUlv9NYA8ZYgwRP/OQDqpX3Ls9HKDKX33uABe9aUKgdZy/e/E6D8ofRRwirlfJibTaYw==
+protoc-gen-grpc@1.4.4:
+  version "1.4.4"
+  resolved "https://registry.yarnpkg.com/protoc-gen-grpc/-/protoc-gen-grpc-1.4.4.tgz#c0153d8b80f9ed2357a2309df146765fd85ec15b"
+  integrity sha512-3iSYdEvmoCg2TVBr+taerFG/5OPqmb7MWtaPz3dDRmCtf+gbXQEv0B/W7H8l/feiPVUbrCfiEPb+Lo08SZaYVg==
   dependencies:
     google-protobuf "^3.8.0"
     node-pre-gyp "^0.13.0"

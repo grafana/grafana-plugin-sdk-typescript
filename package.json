@@ -32,7 +32,7 @@
     "grpc": "^1.24.3",
     "google-protobuf": "^3.12.2",
     "grpc-tools": "^1.9.0",
-    "protoc-gen-grpc": "1.4.0",
+    "protoc-gen-grpc": "1.4.4",
     "@grafana/tsconfig": "^1.0.0-rc1",
     "request-promise-native": "1.0.8",
     "@types/request-promise-native": "1.0.14",
