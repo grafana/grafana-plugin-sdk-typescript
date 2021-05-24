@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { DataFrame, grafanaDataFrameToArrowTable } from '@grafana/data';
+import { DataFrame, grafanaDataFrameToArrowTable, FieldType, ArrayVector, DateTime } from '@grafana/data';
 import * as proto from './proto/backend_grpc_pb';
 import {
   CheckHealthRequest,
@@ -19,6 +19,8 @@ import {
 import * as grpc from 'grpc';
 import { Logger } from './logging';
 import { API } from './api';
+import { RecordBatchFileWriter } from 'apache-arrow';
+
 
 export {
   CheckHealthRequest,
@@ -124,12 +126,34 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
               json: contextAsO,
             }
           });
+
+          const writer = new RecordBatchFileWriter()
           dataFrames.forEach((dataFrame: DataFrame) => {
-            dataResponse.addFrames(grafanaDataFrameToArrowTable(dataFrame).serialize());
+            const newFields = dataFrame.fields.map(field => {
+              if (field.type == FieldType.time) {
+                return {
+                  ...field,
+                  values: new ArrayVector(field.values.toArray().map((value: DateTime) => value.valueOf() * 1000)),
+                }
+              }
+              return field;
+            });
+            const newDataFrame = {
+              ...dataFrame,
+              fields: newFields,
+            };
+            const table = grafanaDataFrameToArrowTable(newDataFrame);
+            writer.write(table);
           });
-          
+
+          writer.finish();
+          const frames = await writer.toUint8Array();
+          dataResponse.addFrames(frames);
+          writer.close();
+
           response.getResponsesMap().set(query.refid, dataResponse);
-        };
+        }
+        
       }
     } catch(ex) {
       logger.error("Query data exception", ex);
