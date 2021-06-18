@@ -8,7 +8,8 @@
   ],
   "pkg": {
     "assets": [
-      "/**/backend.proto"
+      "proto/*",
+      "node_modules/grpc/**/*"
     ]
   },
   "bin": {
@@ -29,9 +30,6 @@
     "@grafana/runtime": "7.5.5",
     "@grafana/ui": "7.5.5",
     "@types/lodash": "4.14.168",
-    "grpc": "^1.24.3",
-    "google-protobuf": "^3.12.2",
-    "grpc-tools": "^1.9.0",
     "protoc-gen-grpc": "1.4.4",
     "@grafana/tsconfig": "^1.0.0-rc1",
     "request-promise-native": "1.0.8",
@@ -40,6 +38,9 @@
   },
   "dependencies": {
     "typescript": "4.2.2",
+    "grpc": "^1.24.3",
+    "google-protobuf": "^3.12.2",
+    "grpc-tools": "^1.9.0",
     "pkg": "4.5.0",
     "nexe": "3.3.3"
   },
