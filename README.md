@@ -2,6 +2,11 @@
 
 This framework is for writing a backend datasource in typescript
 
+
+## Support
+This SDK is not an officialy supported Grafana Labs project! You can find the officialy supported SDK [here](https://pkg.go.dev/github.com/grafana/grafana-plugin-sdk-go). We recommend to read the [official guide](https://grafana.com/docs/grafana/latest/developers/plugins/) on how to build your own plugins first.
+
+
 ## What is Grafana Data Source Backend Plugin?
 
 Grafana supports a wide range of data sources, including Prometheus, MySQL, and even Datadog. There’s a good chance you can already visualize metrics from the systems you have set up. In some cases, though, you already have an in-house metrics solution that you’d like to add to your Grafana dashboards. Grafana Data Source Plugins enables integrating such solutions with Grafana.
