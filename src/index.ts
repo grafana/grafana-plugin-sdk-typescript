@@ -20,8 +20,6 @@ import * as grpc from 'grpc';
 import { Logger } from './helpers/logging';
 import { RecordBatchFileWriter } from 'apache-arrow';
 
-import { DataSourceInstanceSettings } from './proto/backend_pb';
-
 export class API {
   constructor(settings: DataSourceInstanceSettings.AsObject) {
 

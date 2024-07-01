@@ -1,4 +1,4 @@
-import { BackendServer } from '@grafana/tsbackend';
+import { BackendServer } from '../src/';
 import { TemplateDiagnosticsService } from './DiagnosticsService';
 import { TemplateDataService } from './DataService';
 import { TemplateResourceService } from './ResourceService';

@@ -1,4 +1,4 @@
-import { logger as log, CheckHealthRequest, CheckHealthResponse, DiagnosticsService, CollectMetricsRequest, CollectMetricsResponse } from '@grafana/tsbackend';
+import { logger as log, CheckHealthRequest, CheckHealthResponse, DiagnosticsService, CollectMetricsRequest, CollectMetricsResponse } from '../src/';
 
 export class TemplateDiagnosticsService extends DiagnosticsService {
   CheckHealth = async (request: CheckHealthRequest): Promise<CheckHealthResponse> => {

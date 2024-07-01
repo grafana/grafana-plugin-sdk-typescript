@@ -1,4 +1,4 @@
-import { DataFrame, DataService, DataRequest } from '@grafana/tsbackend';
+import { DataFrame, DataService, DataRequest } from '../src/';
 import { FieldType, ArrayVector } from '@grafana/data';
 
 export class TemplateDataService extends DataService {
