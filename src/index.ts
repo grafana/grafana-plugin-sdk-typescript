@@ -17,10 +17,20 @@ import {
   PluginContext as InternalPluginContext,
 } from './proto/backend_pb';
 import * as grpc from 'grpc';
-import { Logger } from './logging';
-import { API } from './api';
+import { Logger } from './helpers/logging';
 import { RecordBatchFileWriter } from 'apache-arrow';
 
+import { DataSourceInstanceSettings } from './proto/backend_pb';
+
+export class API {
+  constructor(settings: DataSourceInstanceSettings.AsObject) {
+
+  }
+
+  public testDatasource(): any {
+    throw "Not implemented Yet..."
+  }
+}
 
 export {
   CheckHealthRequest,

@@ -1,8 +1,8 @@
 import { DataSourceJsonData } from '@grafana/data';
-import { BackendSrv, BackendSrvRequest, BackendSrvResponse } from '../backend_srv';
+import { BackendSrv, BackendSrvRequest, BackendSrvResponse } from './backend_srv';
 import requestPromise from 'request-promise-native';
 import { DataSourceInstanceSettings } from '../index';
-import { Logger } from '../logging';
+import { Logger } from '../helpers/logging';
 
 const logger: Logger = new Logger();
 
