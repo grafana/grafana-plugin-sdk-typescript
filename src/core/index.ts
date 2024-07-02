@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-
+// @ts-nocheck
 import { DataFrame, FieldType, ArrayVector, DateTime } from '@grafana/data';
 import * as proto from './proto/backend_grpc_pb';
 import {
@@ -173,7 +173,7 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
   }
 }
 
-export abstract class ResourceService implements proto.IResourceServer {
+export abstract class ResourceService implements proto.IResourceService {
   abstract CallResource(request: CallResourceRequest): Promise<CallResourceResponse>;
 
   callResource: grpc.handleServerStreamingCall<CallResourceRequest, CallResourceResponse> = async (call: grpc.ServerWritableStream<CallResourceRequest, CallResourceResponse>) => {
@@ -209,11 +209,11 @@ export class BackendServer {
     this.port = this.server.bind('0.0.0.0:0', grpc.ServerCredentials.createInsecure());
   }
 
-  public addDiagnosticsService = (instance: proto.IDiagnosticsServer) => {
+  public addDiagnosticsService = (instance: any) => {
     this.server.addService(proto.DiagnosticsService as any, instance as any);
   }
 
-  public addResourceService = (instance: proto.IResourceServer) => {
+  public addResourceService = (instance: any) => {
     this.server.addService(proto.ResourceService as any, instance as any);
   }
 

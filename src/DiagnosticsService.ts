@@ -1,4 +1,5 @@
-import { logger as log, CheckHealthRequest, CheckHealthResponse, DiagnosticsService, CollectMetricsRequest, CollectMetricsResponse } from './core';
+import { logger as log, CheckHealthRequest,
+  CheckHealthResponse, DiagnosticsService, CollectMetricsRequest, CollectMetricsResponse } from './core';
 
 export class TemplateDiagnosticsService extends DiagnosticsService {
   CheckHealth = async (request: CheckHealthRequest): Promise<CheckHealthResponse> => {
