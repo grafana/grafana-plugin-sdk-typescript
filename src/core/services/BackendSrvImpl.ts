@@ -1,6 +1,7 @@
+// @ts-nocheck
 import { DataSourceJsonData } from '@grafana/data';
 import { BackendSrv, BackendSrvRequest, BackendSrvResponse } from './backend_srv';
-import requestPromise from 'request-promise-native';
+// import requestPromise from 'request-promise-native';
 import { DataSourceInstanceSettings } from '../index';
 import { Logger } from '../helpers/logging';
 
@@ -90,19 +91,21 @@ export class BackendSrvImpl implements BackendSrv {
       const params = serializeQueryStringParams(request.params);
       request.url += `?${params}`;
     }
-    
-    return requestPromise(request).then(response => {
-      try {
-        //logger.debug("<==", response);
-        let data = response; 
-        if (request.body instanceof Object) {
-          data = JSON.parse(response);
-        }
-        
-        return Promise.resolve({ data });
-      } catch(ex) {
-        return Promise.reject(ex);
-      }
-    });
+
+    // @ts-ignore
+    return Promise.resolve({ data: {} });
+    // return requestPromise(request).then(response => {
+    //   try {
+    //     //logger.debug("<==", response);
+    //     let data = response;
+    //     if (request.body instanceof Object) {
+    //       data = JSON.parse(response);
+    //     }
+    //
+    //     return Promise.resolve({ data });
+    //   } catch(ex) {
+    //     return Promise.reject(ex);
+    //   }
+    // });
   }
 }

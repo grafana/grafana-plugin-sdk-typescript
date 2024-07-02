@@ -206,7 +206,6 @@ export class BackendServer {
   port: number;
   constructor() {
     this.server = new grpc.Server();
-    this.port = this.server.bind('0.0.0.0:0', grpc.ServerCredentials.createInsecure());
   }
 
   public addDiagnosticsService = (instance: any) => {
@@ -222,8 +221,10 @@ export class BackendServer {
   }
   
   public run() {
-    this.server.start();
-    console.log(`1|2|tcp|localhost:${this.port}|grpc`);
+    this.server.bindAsync('0.0.0.0:0', grpc.ServerCredentials.createInsecure(), (error, port) => {
+      this.server.start();
+      console.log(`1|2|tcp|localhost:${port}|grpc`);
+    })
   }
 }
 

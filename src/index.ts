@@ -3,9 +3,11 @@ import { TemplateDiagnosticsService } from './DiagnosticsService';
 import { TemplateDataService } from './DataService';
 import { TemplateResourceService } from './ResourceService';
 
-const app = new BackendServer();
+export const app = new BackendServer();
 app.addDiagnosticsService(new TemplateDiagnosticsService());
 app.addDataService(new TemplateDataService());
 app.addResourceService(new TemplateResourceService() as any);
 
-module.exports = app;
+// console.log('123')
+
+app.run();
