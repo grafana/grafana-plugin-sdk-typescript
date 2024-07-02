@@ -3,13 +3,13 @@
     "target": "ES6",
     "module": "commonjs",
     "sourceMap": true,
-    "rootDir": "pkg",
+    "rootDir": "src",
     "outDir": "dist",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
-//    "typeRoots": ["node_modules/@types", "types"]
+    "typeRoots": ["node_modules/@types", "types"]
   },
   "exclude": ["dist", "node_modules"],
-  "include": ["pkg/**/*.ts*"]
+  "include": ["src/**/*.ts*"]
 }

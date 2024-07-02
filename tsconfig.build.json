@@ -13,5 +13,7 @@
   },
   "exclude": ["dist", "node_modules", "skel"],
   "extends": "@grafana/tsconfig",
-  "include": ["src/**/*.ts*", "src/proto/*"]
+  "include": ["src/**/*.ts*",
+    "src/core/proto/*"
+  ]
 }

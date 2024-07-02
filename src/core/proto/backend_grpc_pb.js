@@ -1,7 +1,7 @@
 // GENERATED CODE -- DO NOT EDIT!
 
 'use strict';
-var grpc = require('grpc');
+var grpc = require('@grpc/grpc-js');
 var backend_pb = require('./backend_pb.js');
 
 function serialize_pluginv2_CallResourceRequest(arg) {
@@ -233,10 +233,10 @@ exports.DiagnosticsClient = grpc.makeGenericClientConstructor(DiagnosticsService
 //
 var StreamService = exports.StreamService = {
   // SubscribeStream called when a user tries to subscribe to a plugin/datasource
-  // managed channel path – thus plugin can check subscribe permissions and communicate
-  // options with Grafana Core. When the first subscriber joins a channel, RunStream
-  // will be called. 
-  subscribeStream: {
+// managed channel path – thus plugin can check subscribe permissions and communicate
+// options with Grafana Core. When the first subscriber joins a channel, RunStream
+// will be called. 
+subscribeStream: {
     path: '/pluginv2.Stream/SubscribeStream',
     requestStream: false,
     responseStream: false,
@@ -248,11 +248,11 @@ var StreamService = exports.StreamService = {
     responseDeserialize: deserialize_pluginv2_SubscribeStreamResponse,
   },
   // RunStream will be initiated by Grafana to consume a stream. RunStream will be
-  // called once for the first client successfully subscribed to a channel path.
-  // When Grafana detects that there are no longer any subscribers inside a channel,
-  // the call will be terminated until next active subscriber appears. Call termination
-  // can happen with a delay.
-  runStream: {
+// called once for the first client successfully subscribed to a channel path.
+// When Grafana detects that there are no longer any subscribers inside a channel,
+// the call will be terminated until next active subscriber appears. Call termination
+// can happen with a delay.
+runStream: {
     path: '/pluginv2.Stream/RunStream',
     requestStream: false,
     responseStream: true,
@@ -264,9 +264,9 @@ var StreamService = exports.StreamService = {
     responseDeserialize: deserialize_pluginv2_StreamPacket,
   },
   // PublishStream called when a user tries to publish to a plugin/datasource
-  // managed channel path. Here plugin can check publish permissions and
-  // modify publication data if required.
-  publishStream: {
+// managed channel path. Here plugin can check publish permissions and
+// modify publication data if required.
+publishStream: {
     path: '/pluginv2.Stream/PublishStream',
     requestStream: false,
     responseStream: false,
