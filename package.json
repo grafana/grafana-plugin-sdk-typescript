@@ -53,6 +53,7 @@
     "native-dns": "^0.7.0",
     "nexe": "^4.0.0-rc.6",
     "pkg": "5.8.1",
+    "react": "^18.3.1",
     "trusted-types": "^2.0.0",
     "typescript": "5.5.3"
   }
