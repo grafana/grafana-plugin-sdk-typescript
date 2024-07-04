@@ -48,8 +48,10 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "dayjs": "^1.11.11",
     "dns2": "2.1.0",
     "framer": "^2.4.1",
+    "log4js": "^6.9.1",
     "native-dns": "^0.7.0",
     "nexe": "^4.0.0-rc.6",
     "pkg": "5.8.1",

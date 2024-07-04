@@ -7,6 +7,8 @@ export class TemplateDataService extends DataService<any,any> {
   }
 
   QueryData(request: any): Promise<DataFrame[]> {
+
+    console.log('QueryData', request)
     return Promise.resolve([{
       name: 'some data',
       fields: [{

@@ -18,7 +18,31 @@ import {
 } from './proto/backend_pb';
 import * as grpc from '@grpc/grpc-js';
 import { Logger } from './helpers/logging';
-import { RecordBatchFileWriter } from 'apache-arrow';
+import {RecordBatchFileWriter, tableFromArrays, tableFromJSON} from 'apache-arrow';
+
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+// Get the directory name of the current module file
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Define the file path
+const filePath = path.join(__dirname, 'messages.txt');
+
+// Function to write a message to the file
+function writeMessage(message) {
+  // Append the message to the file
+  fs.appendFile(message, message + '\n', (err) => {
+    if (err) {
+      console.error('Error writing to file', err);
+    } else {
+      console.log('Message written to file:', message);
+    }
+  });
+}
+
 
 export class API {
   constructor(settings: DataSourceInstanceSettings<any>) {
@@ -111,11 +135,62 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
   abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<DataFrame[]>;
 
   async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
-    const request: QueryDataRequest.AsObject = call.request.toObject();
-    const context: InternalPluginContext.AsObject = call.request.toObject().plugincontext!;
+    let request: QueryDataRequest.AsObject = {
+      "QueryDataRequest": {
+        "plugincontext": {
+          "orgid": 1,
+          "pluginid": "vertamedia-clickhouse-datasource",
+          "user": {
+            "login": "grafana_scheduler",
+            "name": "grafana_scheduler",
+            "email": "",
+            "role": "Admin"
+          },
+          "datasourceinstancesettings": {
+            "id": 5,
+            "name": "clickhouse",
+            "url": "http://clickhouse:8123",
+            "user": "",
+            "database": "",
+            "basicauthenabled": true,
+            "basicauthuser": "default",
+            "jsondata": "eyJhZGRDb3JzSGVhZGVyIjp0cnVlLCJjb21wcmVzc2lvblR5cGUiOiJnemlwIiwidXNlQ29tcHJlc3Npb24iOnRydWUsInVzZVBPU1QiOnRydWV9",
+            "decryptedsecurejsondataMap": [
+              ["basicAuthPassword", ""]
+            ],
+            "lastupdatedms": 1720124475000,
+            "uid": "P7E099F39B84EA795"
+          }
+        },
+        "headersMap": [
+          ["FromAlert", "true"],
+          ["X-Cache-Skip", "true"],
+          ["X-Grafana-Org-Id", "1"],
+          ["X-Rule-Uid", "test_unified_alert"]
+        ],
+        "queriesList": [
+          {
+            "refid": "A",
+            "maxdatapoints": 43200,
+            "intervalms": 1000,
+            "timerange": {
+              "fromepochms": 1720124290000,
+              "toepochms": 1720124890000
+            },
+            "json": "eyJhZGRfbWV0YWRhdGEiOnRydWUsImRhdGFiYXNlIjoiZGVmYXVsdCIsImRhdGVDb2xEYXRhVHlwZSI6IiIsImRhdGVMb2FkaW5nIjpmYWxzZSwiZGF0ZVRpbWVDb2xEYXRhVHlwZSI6IkV2ZW50VGltZSIsImRhdGVUaW1lVHlwZSI6IkRBVEVUSU1FIiwiZGF0ZXRpbWVMb2FkaW5nIjpmYWxzZSwiZXh0cmFwb2xhdGUiOnRydWUsImZvcm1hdCI6InRpbWVfc2VyaWVzIiwiZm9ybWF0dGVkUXVlcnkiOiJTRUxFQ1QgJHRpbWVTZXJpZXMgYXMgdCwgTmFtZSwgY291bnQoKSBGUk9NICR0YWJsZSBXSEVSRSAkdGltZUZpbHRlciBHUk9VUCBCWSB0LE5hbWUgT1JERVIgQlkgdCxOYW1lIiwiaW50ZXJ2YWwiOiIiLCJpbnRlcnZhbEZhY3RvciI6MSwiaW50ZXJ2YWxNcyI6MTAwMCwibWF4RGF0YVBvaW50cyI6NDMyMDAsInF1ZXJ5IjoiU0VMRUNUXG4gICAgJHRpbWVTZXJpZXMgYXMgdCxcbiAgICBOYW1lLFxuICAgIHN1bShWYWx1ZSkgdlxuRlJPTSAkdGFibGVcblxuV0hFUkUgJHRpbWVGaWx0ZXJcblxuR1JPVVAgQlkgdCwgTmFtZVxuXG5PUkRFUiBCWSB0LCBOYW1lXG4iLCJyYXdRdWVyeSI6dHJ1ZSwicmVmSWQiOiJBIiwicm91bmQiOiIwcyIsInNraXBfY29tbWVudHMiOnRydWUsInRhYmxlIjoidGVzdF9hbGVydHMiLCJ0YWJsZUxvYWRpbmciOmZhbHNlfQ==",
+            "querytype": ""
+          }
+        ]
+      }
+    }
+
+    request = request.QueryDataRequest;
+    const context: InternalPluginContext.AsObject = request.plugincontext!;
     const response: QueryDataResponse = new QueryDataResponse();
     let err: grpc.ServiceError | null = null;
+    // writeMessage('QueryDataRequest' + JSON.stringify(request));
 
+    console.log(request.plugincontext?.datasourceinstancesettings)
     try {
       if (request.plugincontext?.datasourceinstancesettings) {
         for (let query of request.queriesList) {
@@ -135,13 +210,14 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
             }
           });
 
+          console.log('DataFrames', dataFrames)
           const writer = new RecordBatchFileWriter()
           dataFrames.forEach((dataFrame: DataFrame) => {
             const newFields = dataFrame.fields.map(field => {
               if (field.type == FieldType.time) {
                 return {
                   ...field,
-                  values: new ArrayVector(field.values.toArray().map((value: DateTime) => value.valueOf() * 1000)),
+                  values: new ArrayVector([192, 168, 0]),
                 }
               }
               return field;
@@ -151,10 +227,23 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
               fields: newFields,
             };
             console.log(newDataFrame)
-            // const table = grafanaDataFrameToArrowTable(newDataFrame);
-            // writer.write(table);
-          });
+            // const table = tableFromArrays([[123,123]]);
+            const LENGTH = 2000;
 
+            const rainAmounts = Float32Array.from(
+                { length: LENGTH },
+                () => Number((Math.random() * 20).toFixed(1)));
+
+            const rainDates = Array.from(
+                { length: LENGTH },
+                (_, i) => new Date(Date.now() - 1000 * 60 * 60 * 24 * i));
+
+            const rainfall = tableFromArrays({
+              precipitation: rainAmounts,
+              date: rainDates,
+            });
+            writer.write(rainfall);
+          });
           writer.finish();
           const frames = await writer.toUint8Array();
           dataResponse.addFrames(frames);
