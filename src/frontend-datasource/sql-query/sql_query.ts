@@ -31,14 +31,10 @@ export default class SqlQuery {
       query = Scanner.AddMetadata(query);
     }
 
-    query = this.templateSrv.replace(
-      SqlQueryHelper.conditionalTest(query, this.templateSrv),
-      options.scopedVars,
-      SqlQueryHelper.interpolateQueryExpr
-    );
+    query = query
     let scanner = new Scanner(query);
     let dateTimeType = this.target.dateTimeType ? this.target.dateTimeType : TimestampFormat.DateTime;
-    let i = this.templateSrv.replace(this.target.interval, options.scopedVars) || options.interval;
+    let i = options.interval;
     let interval = SqlQueryHelper.convertInterval(i, this.target.intervalFactor || 1);
     let intervalMs = SqlQueryHelper.convertInterval(i, this.target.intervalFactor || 1, true);
     let adhocCondition: any[] = [];
@@ -127,6 +123,7 @@ export default class SqlQuery {
     let from = SqlQueryHelper.convertTimestamp(SqlQueryHelper.round(this.options.range.from, myround));
     let to = SqlQueryHelper.convertTimestamp(SqlQueryHelper.round(this.options.range.to, myround));
 
+    console.log('<<<<<<<<<<<', from, to)
     // TODO: replace
     this.target.rawQuery = query
       .replace(/\$timeSeries\b/g, SqlQueryMacros.getTimeSeries(dateTimeType))

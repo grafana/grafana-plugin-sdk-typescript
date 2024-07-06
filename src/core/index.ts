@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // @ts-nocheck
-import { DataFrame, FieldType, ArrayVector, DateTime } from '@grafana/data';
+import { DataFrame, FieldType, ArrayVector, DateTime, dataFrameToJSON} from '@grafana/data';
 import * as proto from './proto/backend_grpc_pb';
 import {
   CheckHealthRequest,
@@ -24,12 +24,21 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
+import { writeFileSync } from 'fs';
+
+// Specify the file path and the data to write
+const filePath = './example.txt';
+const data = '123';
+
+// Write the data to the file
+writeFileSync(filePath, data);
+
 // Get the directory name of the current module file
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // Define the file path
-const filePath = path.join(__dirname, 'messages.txt');
+// const filePath = path.join(__dirname, 'messages.txt');
 
 // Function to write a message to the file
 function writeMessage(message) {
@@ -179,6 +188,17 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
             },
             "json": "eyJhZGRfbWV0YWRhdGEiOnRydWUsImRhdGFiYXNlIjoiZGVmYXVsdCIsImRhdGVDb2xEYXRhVHlwZSI6IiIsImRhdGVMb2FkaW5nIjpmYWxzZSwiZGF0ZVRpbWVDb2xEYXRhVHlwZSI6IkV2ZW50VGltZSIsImRhdGVUaW1lVHlwZSI6IkRBVEVUSU1FIiwiZGF0ZXRpbWVMb2FkaW5nIjpmYWxzZSwiZXh0cmFwb2xhdGUiOnRydWUsImZvcm1hdCI6InRpbWVfc2VyaWVzIiwiZm9ybWF0dGVkUXVlcnkiOiJTRUxFQ1QgJHRpbWVTZXJpZXMgYXMgdCwgTmFtZSwgY291bnQoKSBGUk9NICR0YWJsZSBXSEVSRSAkdGltZUZpbHRlciBHUk9VUCBCWSB0LE5hbWUgT1JERVIgQlkgdCxOYW1lIiwiaW50ZXJ2YWwiOiIiLCJpbnRlcnZhbEZhY3RvciI6MSwiaW50ZXJ2YWxNcyI6MTAwMCwibWF4RGF0YVBvaW50cyI6NDMyMDAsInF1ZXJ5IjoiU0VMRUNUXG4gICAgJHRpbWVTZXJpZXMgYXMgdCxcbiAgICBOYW1lLFxuICAgIHN1bShWYWx1ZSkgdlxuRlJPTSAkdGFibGVcblxuV0hFUkUgJHRpbWVGaWx0ZXJcblxuR1JPVVAgQlkgdCwgTmFtZVxuXG5PUkRFUiBCWSB0LCBOYW1lXG4iLCJyYXdRdWVyeSI6dHJ1ZSwicmVmSWQiOiJBIiwicm91bmQiOiIwcyIsInNraXBfY29tbWVudHMiOnRydWUsInRhYmxlIjoidGVzdF9hbGVydHMiLCJ0YWJsZUxvYWRpbmciOmZhbHNlfQ==",
             "querytype": ""
+          },
+          {
+            "refid": "B",
+            "maxdatapoints": 43200,
+            "intervalms": 1000,
+            "timerange": {
+              "fromepochms": 1720124290000,
+              "toepochms": 1720124890000
+            },
+            "json": "eyJhZGRfbWV0YWRhdGEiOnRydWUsImRhdGFiYXNlIjoiZGVmYXVsdCIsImRhdGVDb2xEYXRhVHlwZSI6IiIsImRhdGVMb2FkaW5nIjpmYWxzZSwiZGF0ZVRpbWVDb2xEYXRhVHlwZSI6IkV2ZW50VGltZSIsImRhdGVUaW1lVHlwZSI6IkRBVEVUSU1FIiwiZGF0ZXRpbWVMb2FkaW5nIjpmYWxzZSwiZXh0cmFwb2xhdGUiOnRydWUsImZvcm1hdCI6InRpbWVfc2VyaWVzIiwiZm9ybWF0dGVkUXVlcnkiOiJTRUxFQ1QgJHRpbWVTZXJpZXMgYXMgdCwgTmFtZSwgY291bnQoKSBGUk9NICR0YWJsZSBXSEVSRSAkdGltZUZpbHRlciBHUk9VUCBCWSB0LE5hbWUgT1JERVIgQlkgdCxOYW1lIiwiaW50ZXJ2YWwiOiIiLCJpbnRlcnZhbEZhY3RvciI6MSwiaW50ZXJ2YWxNcyI6MTAwMCwibWF4RGF0YVBvaW50cyI6NDMyMDAsInF1ZXJ5IjoiU0VMRUNUXG4gICAgJHRpbWVTZXJpZXMgYXMgdCxcbiAgICBOYW1lLFxuICAgIHN1bShWYWx1ZSkgdlxuRlJPTSAkdGFibGVcblxuV0hFUkUgJHRpbWVGaWx0ZXJcblxuR1JPVVAgQlkgdCwgTmFtZVxuXG5PUkRFUiBCWSB0LCBOYW1lXG4iLCJyYXdRdWVyeSI6dHJ1ZSwicmVmSWQiOiJBIiwicm91bmQiOiIwcyIsInNraXBfY29tbWVudHMiOnRydWUsInRhYmxlIjoidGVzdF9hbGVydHMiLCJ0YWJsZUxvYWRpbmciOmZhbHNlfQ==",
+            "querytype": ""
           }
         ]
       }
@@ -188,7 +208,7 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
     const context: InternalPluginContext.AsObject = request.plugincontext!;
     const response: QueryDataResponse = new QueryDataResponse();
     let err: grpc.ServiceError | null = null;
-    // writeMessage('QueryDataRequest' + JSON.stringify(request));
+    // writeMessage('QueryDataRequest222' + JSON.stringify(call.request.toObject()));
 
     console.log(request.plugincontext?.datasourceinstancesettings)
     try {
@@ -217,17 +237,19 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
               if (field.type == FieldType.time) {
                 return {
                   ...field,
-                  values: new ArrayVector([192, 168, 0]),
+                  values: field.values,
                 }
               }
               return field;
             });
+
             const newDataFrame = {
               ...dataFrame,
               fields: newFields,
             };
-            console.log(newDataFrame)
-            // const table = tableFromArrays([[123,123]]);
+
+            // console.log(newDataFrame, 'NEW DATA FRAME')
+            // console.log(newDataFrame, 'NEW DATA FRAME')
             const LENGTH = 2000;
 
             const rainAmounts = Float32Array.from(
@@ -242,10 +264,16 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
               precipitation: rainAmounts,
               date: rainDates,
             });
+
+            // const rainfall2 = tableFromArrays({
+            //   data: newDataFrame.fields,
+            // });
             writer.write(rainfall);
           });
           writer.finish();
           const frames = await writer.toUint8Array();
+          // var str = String.fromCharCode.apply(null, frames);
+          // console.log(str, 'FRAMES');
           dataResponse.addFrames(frames);
           writer.close();
 
@@ -254,7 +282,7 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
         
       }
     } catch(ex: any) {
-      logger.error("Query data exception", ex);
+      throw new Error("Query data exception" + ex)
       err = ex;
     }
 
@@ -311,7 +339,6 @@ export class BackendServer {
   
   public run() {
     this.server.bindAsync('0.0.0.0:0', grpc.ServerCredentials.createInsecure(), (error, port) => {
-      this.server.start();
       console.log(`1|2|tcp|localhost:${port}|grpc`);
     })
   }
