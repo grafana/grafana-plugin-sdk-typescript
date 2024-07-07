@@ -33,7 +33,7 @@ module.exports = {
         },
     },
     output: {
-        filename: 'core.js',
+        filename: 'backend-plugin.js',
         path: path.resolve(__dirname, 'dist'),
     },
     mode: 'development',
