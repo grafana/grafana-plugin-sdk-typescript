@@ -81,16 +81,16 @@ export class TemplateDataService extends DataService<any,any> {
     const target = request.query
     const newQuery = createQuery({interval: "30s"}, target)
 
-    const clickhouseClient = new ClickHouseClient(getRequestSettings());
-    const parsedQuery = getParsedQuery(request);
-
-    const result = await clickhouseClient.query({}, newQuery.stmt);
-
-
-
-
+    // const clickhouseClient = new ClickHouseClient(getRequestSettings());
+    // const parsedQuery = getParsedQuery(request);
+    //
+    // const result = await clickhouseClient.query({}, newQuery.stmt);
+    //
+    //
+    //
+    //
     // console.log(result.body.data)
-    console.log(result)
+    // console.log(result)
 
     // this.options = options;
     // const target = options.targets[0]
