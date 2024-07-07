@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 // @ts-nocheck
-import { DataFrame, FieldType, ArrayVector, DateTime, dataFrameToJSON} from '@grafana/data';
 import * as proto from './proto/backend_grpc_pb';
 import {
   CheckHealthRequest,
@@ -219,7 +218,7 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
           const queryAsQ: Q = JSON.parse(jsonString);
           const contextJson: string = Buffer.from(context.datasourceinstancesettings?.jsondata as string, 'base64').toString('ascii');
           const contextAsO: O = JSON.parse(contextJson);
-          const dataFrames: DataFrame[] = await this.QueryData({
+          const dataFrames: any[] = await this.QueryData({
             ...query,
             query: queryAsQ,
           }, {
@@ -232,9 +231,9 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
 
           console.log('DataFrames', dataFrames)
           const writer = new RecordBatchFileWriter()
-          dataFrames.forEach((dataFrame: DataFrame) => {
+          dataFrames.forEach((dataFrame: any) => {
             const newFields = dataFrame.fields.map(field => {
-              if (field.type == FieldType.time) {
+              if (field.type == "time") {
                 return {
                   ...field,
                   values: field.values,
@@ -248,8 +247,6 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
               fields: newFields,
             };
 
-            // console.log(newDataFrame, 'NEW DATA FRAME')
-            // console.log(newDataFrame, 'NEW DATA FRAME')
             const LENGTH = 2000;
 
             const rainAmounts = Float32Array.from(
@@ -350,6 +347,5 @@ grpc.setLogVerbosity(grpc.logVerbosity.INFO);
 
 export {
   logger,
-  Logger,
-  DataFrame,
+  Logger
 }
