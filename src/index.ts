@@ -17,7 +17,7 @@ import {
 } from './proto/backend_pb';
 import * as grpc from '@grpc/grpc-js';
 import { Logger } from './helpers/logging';
-import {RecordBatchFileWriter, tableFromArrays, tableFromJSON} from 'apache-arrow';
+import {RecordBatchFileWriter, tableFromArrays, tableFromJSON, Table} from 'apache-arrow';
 
 import fs from 'fs';
 import path from 'path';
@@ -98,6 +98,7 @@ export abstract class DiagnosticsService implements proto.IDiagnosticsServer {
   abstract CollectMetrics(request: CollectMetricsRequest): Promise<CollectMetricsResponse>;
   
   checkHealth = async (call: grpc.ServerUnaryCall<CheckHealthRequest, CheckHealthResponse>, callback: grpc.sendUnaryData<CheckHealthResponse>) => {
+    // throw new Error('ETO KONEC/ eto konec health')
     let response: CheckHealthResponse = new CheckHealthResponse();
     let err: grpc.ServiceError | null = null;
 
@@ -114,6 +115,7 @@ export abstract class DiagnosticsService implements proto.IDiagnosticsServer {
   }
 
   collectMetrics = async (call: grpc.ServerUnaryCall<CollectMetricsRequest, CollectMetricsResponse>, callback: grpc.sendUnaryData<CollectMetricsResponse>) => {
+    // throw new Error('ETO KONEC/ eto konec 3')
     let response: CollectMetricsResponse = new CollectMetricsResponse();
     let err: grpc.ServiceError | null = null;
     
@@ -141,40 +143,42 @@ export interface PluginContext<T> extends InternalPluginContext.AsObject {
 
 export abstract class DataService<Q,O> implements proto.IDataServer {
   abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<DataFrame[]>;
-
   async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
-    let request: QueryDataRequest.AsObject = {
-      "QueryDataRequest": {
-        "plugincontext": {
-          "orgid": 1,
-          "pluginid": "vertamedia-clickhouse-datasource",
-          "user": {
-            "login": "grafana_scheduler",
-            "name": "grafana_scheduler",
-            "email": "",
-            "role": "Admin"
+
+    const request = {
+      "plugincontext": {
+        "orgid": 1,
+        "pluginid": "vertamedia-clickhouse-datasource",
+        "user": {
+          "login": "",
+          "name": "",
+          "email": "",
+          "role": "Admin"
+        },
+        "datasourceinstancesettings": {
+          "id": 5,
+          "name": "clickhouse",
+          "url": "http://clickhouse:8123",
+          "user": "",
+          "database": "",
+          "basicauthenabled": true,
+          "basicauthuser": "default",
+          "jsondata": {
+            "addCorsHeader": true,
+            "compressionType": "gzip",
+            "useCompression": true,
+            "usePOST": true
           },
-          "datasourceinstancesettings": {
-            "id": 5,
-            "name": "clickhouse",
-            "url": "http://clickhouse:8123",
-            "user": "",
-            "database": "",
-            "basicauthenabled": true,
-            "basicauthuser": "default",
-            "jsondata": "eyJhZGRDb3JzSGVhZGVyIjp0cnVlLCJjb21wcmVzc2lvblR5cGUiOiJnemlwIiwidXNlQ29tcHJlc3Npb24iOnRydWUsInVzZVBPU1QiOnRydWV9",
-            "decryptedsecurejsondataMap": [
-              ["basicAuthPassword", ""]
-            ],
-            "lastupdatedms": 1720124475000,
-            "uid": "P7E099F39B84EA795"
-          }
+          "decryptedsecurejsondataMap": [
+            ["basicAuthPassword", ""]
+          ],
+          "lastupdatedms": 1720528778000,
+          "uid": "P7E099F39B84EA795"
         },
         "headersMap": [
           ["FromAlert", "true"],
           ["X-Cache-Skip", "true"],
-          ["X-Grafana-Org-Id", "1"],
-          ["X-Rule-Uid", "test_unified_alert"]
+          ["http_X-Grafana-Org-Id", "1"]
         ],
         "queriesList": [
           {
@@ -182,42 +186,62 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
             "maxdatapoints": 43200,
             "intervalms": 1000,
             "timerange": {
-              "fromepochms": 1720124290000,
-              "toepochms": 1720124890000
+              "fromepochms": 1720529132456,
+              "toepochms": 1720529732456
             },
-            "json": "eyJhZGRfbWV0YWRhdGEiOnRydWUsImRhdGFiYXNlIjoiZGVmYXVsdCIsImRhdGVDb2xEYXRhVHlwZSI6IiIsImRhdGVMb2FkaW5nIjpmYWxzZSwiZGF0ZVRpbWVDb2xEYXRhVHlwZSI6IkV2ZW50VGltZSIsImRhdGVUaW1lVHlwZSI6IkRBVEVUSU1FIiwiZGF0ZXRpbWVMb2FkaW5nIjpmYWxzZSwiZXh0cmFwb2xhdGUiOnRydWUsImZvcm1hdCI6InRpbWVfc2VyaWVzIiwiZm9ybWF0dGVkUXVlcnkiOiJTRUxFQ1QgJHRpbWVTZXJpZXMgYXMgdCwgTmFtZSwgY291bnQoKSBGUk9NICR0YWJsZSBXSEVSRSAkdGltZUZpbHRlciBHUk9VUCBCWSB0LE5hbWUgT1JERVIgQlkgdCxOYW1lIiwiaW50ZXJ2YWwiOiIiLCJpbnRlcnZhbEZhY3RvciI6MSwiaW50ZXJ2YWxNcyI6MTAwMCwibWF4RGF0YVBvaW50cyI6NDMyMDAsInF1ZXJ5IjoiU0VMRUNUXG4gICAgJHRpbWVTZXJpZXMgYXMgdCxcbiAgICBOYW1lLFxuICAgIHN1bShWYWx1ZSkgdlxuRlJPTSAkdGFibGVcblxuV0hFUkUgJHRpbWVGaWx0ZXJcblxuR1JPVVAgQlkgdCwgTmFtZVxuXG5PUkRFUiBCWSB0LCBOYW1lXG4iLCJyYXdRdWVyeSI6dHJ1ZSwicmVmSWQiOiJBIiwicm91bmQiOiIwcyIsInNraXBfY29tbWVudHMiOnRydWUsInRhYmxlIjoidGVzdF9hbGVydHMiLCJ0YWJsZUxvYWRpbmciOmZhbHNlfQ==",
-            "querytype": ""
-          },
-          {
-            "refid": "B",
-            "maxdatapoints": 43200,
-            "intervalms": 1000,
-            "timerange": {
-              "fromepochms": 1720124290000,
-              "toepochms": 1720124890000
+            "json": {
+              "add_metadata": true,
+              "database": "default",
+              "datasource": {
+                "type": "vertamedia-clickhouse-datasource",
+                "uid": "P7E099F39B84EA795"
+              },
+              "dateColDataType": "EventDate",
+              "dateTimeColDataType": "EventTime",
+              "dateTimeType": "DATETIME",
+              "editorMode": "builder",
+              "extrapolate": true,
+              "format": "table",
+              "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "hide": false,
+              "interval": "",
+              "intervalFactor": 1,
+              "intervalMs": 1000,
+              "maxDataPoints": 43200,
+              "query": "SELECT $timeSeries as t, count(), 1 FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+              "refId": "D",
+              "round": "0s",
+              "skip_comments": true,
+              "table": "test_alerts"
             },
-            "json": "eyJhZGRfbWV0YWRhdGEiOnRydWUsImRhdGFiYXNlIjoiZGVmYXVsdCIsImRhdGVDb2xEYXRhVHlwZSI6IiIsImRhdGVMb2FkaW5nIjpmYWxzZSwiZGF0ZVRpbWVDb2xEYXRhVHlwZSI6IkV2ZW50VGltZSIsImRhdGVUaW1lVHlwZSI6IkRBVEVUSU1FIiwiZGF0ZXRpbWVMb2FkaW5nIjpmYWxzZSwiZXh0cmFwb2xhdGUiOnRydWUsImZvcm1hdCI6InRpbWVfc2VyaWVzIiwiZm9ybWF0dGVkUXVlcnkiOiJTRUxFQ1QgJHRpbWVTZXJpZXMgYXMgdCwgTmFtZSwgY291bnQoKSBGUk9NICR0YWJsZSBXSEVSRSAkdGltZUZpbHRlciBHUk9VUCBCWSB0LE5hbWUgT1JERVIgQlkgdCxOYW1lIiwiaW50ZXJ2YWwiOiIiLCJpbnRlcnZhbEZhY3RvciI6MSwiaW50ZXJ2YWxNcyI6MTAwMCwibWF4RGF0YVBvaW50cyI6NDMyMDAsInF1ZXJ5IjoiU0VMRUNUXG4gICAgJHRpbWVTZXJpZXMgYXMgdCxcbiAgICBOYW1lLFxuICAgIHN1bShWYWx1ZSkgdlxuRlJPTSAkdGFibGVcblxuV0hFUkUgJHRpbWVGaWx0ZXJcblxuR1JPVVAgQlkgdCwgTmFtZVxuXG5PUkRFUiBCWSB0LCBOYW1lXG4iLCJyYXdRdWVyeSI6dHJ1ZSwicmVmSWQiOiJBIiwicm91bmQiOiIwcyIsInNraXBfY29tbWVudHMiOnRydWUsInRhYmxlIjoidGVzdF9hbGVydHMiLCJ0YWJsZUxvYWRpbmciOmZhbHNlfQ==",
             "querytype": ""
           }
         ]
       }
     }
 
-    request = request.QueryDataRequest;
     const context: InternalPluginContext.AsObject = request.plugincontext!;
     const response: QueryDataResponse = new QueryDataResponse();
     let err: grpc.ServiceError | null = null;
-    // writeMessage('QueryDataRequest222' + JSON.stringify(call.request.toObject()));
 
     console.log(request.plugincontext?.datasourceinstancesettings)
+    console.log(1, '------')
     try {
       if (request.plugincontext?.datasourceinstancesettings) {
-        for (let query of request.queriesList) {
+        for (let query of request.plugincontext.queriesList) {
+          console.log(21, '------')
           const dataResponse: DataResponse = new DataResponse();
-          const jsonString: string = Buffer.from(query.json as string, 'base64').toString('ascii');
-          const queryAsQ: Q = JSON.parse(jsonString);
-          const contextJson: string = Buffer.from(context.datasourceinstancesettings?.jsondata as string, 'base64').toString('ascii');
-          const contextAsO: O = JSON.parse(contextJson);
+          console.log(211, '------')
+
+          // const jsonString: string = Buffer.from(query.json as string, 'base64').toString('ascii');
+          const jsonString: string = query.json
+          const queryAsQ: Q = query.json
+          console.log(22, '------')
+          // const contextJson: string = Buffer.from(context.datasourceinstancesettings?.jsondata as string, 'base64').toString('ascii');
+          console.log(23, '------')
+
+          const contextAsO: O = context.datasourceinstancesettings.jsondata
+          console.log(2, '------')
           const dataFrames: any[] = await this.QueryData({
             ...query,
             query: queryAsQ,
@@ -229,62 +253,101 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
             }
           });
 
-          console.log('DataFrames', dataFrames)
-          const writer = new RecordBatchFileWriter()
-          dataFrames.forEach((dataFrame: any) => {
-            const newFields = dataFrame.fields.map(field => {
-              if (field.type == "time") {
-                return {
-                  ...field,
-                  values: field.values,
-                }
-              }
-              return field;
-            });
+          const dataFrame = dataFrames
+        console.log(3, '------', dataFrames)
+        const writer = new RecordBatchFileWriter()
+          // const newFields = dataFrame.fields.map(field => {
+          //   if (field.type == "time") {
+          //     return {
+          //       ...field,
+          //       values: field.values,
+          //     }
+          //   }
+          //   return field;
+          // });
 
-            const newDataFrame = {
-              ...dataFrame,
-              fields: newFields,
-            };
+          console.log(4, '------')
+          // const newDataFrame = {
+          //   ...dataFrame,
+          //   fields: newFields,
+          // };
 
-            const LENGTH = 2000;
+          const LENGTH = 2000;
 
-            const rainAmounts = Float32Array.from(
-                { length: LENGTH },
-                () => Number((Math.random() * 20).toFixed(1)));
+          const rainAmounts = Float32Array.from(
+              { length: LENGTH },
+              () => Number((Math.random() * 20).toFixed(1)));
+          const rainDates = Array.from(
+              { length: LENGTH },
+              (_, i) => new Date(Date.now() - 1000 * 60 * 60 * 24 * i));
 
-            const rainDates = Array.from(
-                { length: LENGTH },
-                (_, i) => new Date(Date.now() - 1000 * 60 * 60 * 24 * i));
-
-            const rainfall = tableFromArrays({
-              precipitation: rainAmounts,
-              date: rainDates,
-            });
-
-            // const rainfall2 = tableFromArrays({
-            //   data: newDataFrame.fields,
-            // });
-            writer.write(rainfall);
+          const rainfall = tableFromArrays({
+            precipitation: rainAmounts,
+            date: rainDates,
           });
+
+
+          // writer.write(rainfall);
+
+
+          console.log(JSON.stringify(dataFrame), 'final data shit 1')
+
+          const finalDataShit = dataFrame.fields.reduce((acc,field) => {
+            acc[field.name] = field.values;
+
+            return acc
+          }, {})
+
+          console.log(finalDataShit, 'final data shit 2')
+
+          writer.write(tableFromArrays(finalDataShit));
+
           writer.finish();
           const frames = await writer.toUint8Array();
-          // var str = String.fromCharCode.apply(null, frames);
-          // console.log(str, 'FRAMES');
+
           dataResponse.addFrames(frames);
           writer.close();
-
           response.getResponsesMap().set(query.refid, dataResponse);
         }
-        
+
       }
     } catch(ex: any) {
-      throw new Error("Query data exception" + ex)
+      console.trace(ex)
       err = ex;
     }
 
     callback(err, response);
   }
+
+  // async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
+  //   // throw new Error('ETO KONEC/ eto konec 2')
+  //   const response: QueryDataResponse = new QueryDataResponse();
+  //   const dataResponse: DataResponse = new DataResponse();
+  //   const writer = new RecordBatchFileWriter()
+  //   const LENGTH = 2000;
+  //
+  //   const rainAmounts = Float32Array.from(
+  //       { length: LENGTH },
+  //       () => Number((Math.random() * 20).toFixed(1)));
+  //
+  //   const rainDates = Array.from(
+  //       { length: LENGTH },
+  //       (_, i) => new Date(Date.now() - 1000 * 60 * 60 * 24 * i));
+  //
+  //   const rainfall = tableFromArrays({
+  //     precipitation: rainAmounts,
+  //     date: rainDates,
+  //   });
+  //
+  //   writer.write(rainfall);
+  //   writer.finish();
+  //   const frames = await writer.toUint8Array();
+  //   dataResponse.addFrames(frames);
+  //   writer.close();
+  //
+  //   response.getResponsesMap().set('A', dataResponse);
+  //   callback(null, response);
+  // }
 }
 
 export abstract class ResourceService implements proto.IResourceService {
@@ -294,6 +357,7 @@ export abstract class ResourceService implements proto.IResourceService {
     let response: CallResourceResponse = new CallResourceResponse();
     let err: grpc.ServiceError | null = null;
 
+    // throw new Error('ETO KONEC/ eto konec')
     try {
       response = await this.CallResource(call.request);
     } catch(ex: any) {
@@ -343,7 +407,8 @@ export class BackendServer {
 
 const logger = new Logger();
 grpc.setLogger(logger);
-grpc.setLogVerbosity(grpc.logVerbosity.INFO);  
+grpc.setLogVerbosity(grpc.logVerbosity.DEBUG);
+
 
 export {
   logger,
