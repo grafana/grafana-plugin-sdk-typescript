@@ -46,6 +46,7 @@
   "dependencies": {
     "@grpc/grpc-js": "^1.10.10",
     "apache-arrow": "^16.1.0",
+    "google-protobuf": "3.21.2",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
     "dns2": "2.1.0",
