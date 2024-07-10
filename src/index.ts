@@ -75,6 +75,7 @@ export {
 } from './proto/backend_pb';
 
 import { BackendSrvImpl } from './services/BackendSrvImpl';
+import {processInputData} from "./helpers/prepare-query";
 export { BackendSrvImpl }
 
 export class ApiConnectionManager {
@@ -142,81 +143,82 @@ export interface PluginContext<T> extends InternalPluginContext.AsObject {
 export abstract class DataService<Q,O> implements proto.IDataServer {
     abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<any[]>;
     async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
-
-        const request = {
-            "plugincontext": {
-                "orgid": 1,
-                "pluginid": "vertamedia-clickhouse-datasource",
-                "user": {
-                    "login": "",
-                    "name": "",
-                    "email": "",
-                    "role": "Admin"
-                },
-                "datasourceinstancesettings": {
-                    "id": 5,
-                    "name": "clickhouse",
-                    "url": "http://clickhouse:8123",
-                    "user": "",
-                    "database": "",
-                    "basicauthenabled": true,
-                    "basicauthuser": "default",
-                    "jsondata": {
-                        "addCorsHeader": true,
-                        "compressionType": "gzip",
-                        "useCompression": true,
-                        "usePOST": true
-                    },
-                    "decryptedsecurejsondataMap": [
-                        ["basicAuthPassword", ""]
-                    ],
-                    "lastupdatedms": 1720528778000,
-                    "uid": "P7E099F39B84EA795"
-                },
-                "headersMap": [
-                    ["FromAlert", "true"],
-                    ["X-Cache-Skip", "true"],
-                    ["http_X-Grafana-Org-Id", "1"]
-                ],
-                "queriesList": [
-                    {
-                        "refid": "A",
-                        "maxdatapoints": 43200,
-                        "intervalms": 1000,
-                        "timerange": {
-                            "fromepochms": 1720529132456,
-                            "toepochms": 1720529732456
-                        },
-                        "json": {
-                            "add_metadata": true,
-                            "database": "default",
-                            "datasource": {
-                                "type": "vertamedia-clickhouse-datasource",
-                                "uid": "P7E099F39B84EA795"
-                            },
-                            "dateColDataType": "EventDate",
-                            "dateTimeColDataType": "EventTime",
-                            "dateTimeType": "DATETIME",
-                            "editorMode": "builder",
-                            "extrapolate": true,
-                            "format": "table",
-                            "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-                            "hide": false,
-                            "interval": "",
-                            "intervalFactor": 1,
-                            "intervalMs": 1000,
-                            "maxDataPoints": 43200,
-                            "query": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-                            "refId": "A",
-                            "round": "0s",
-                            "skip_comments": true,
-                            "table": "test_alerts"
-                        },
-                        "querytype": ""
-                    }
-                ]
-            }
-        }
+        let request: QueryDataRequest.AsObject = call.request.toObject();
+        const {queriesList, pluginContext} = processInputData(request)
+        // const request = {
+        //     "plugincontext": {
+        //         "orgid": 1,
+        //         "pluginid": "vertamedia-clickhouse-datasource",
+        //         "user": {
+        //             "login": "",
+        //             "name": "",
+        //             "email": "",
+        //             "role": "Admin"
+        //         },
+        //         "datasourceinstancesettings": {
+        //             "id": 5,
+        //             "name": "clickhouse",
+        //             "url": "http://clickhouse:8123",
+        //             "user": "",
+        //             "database": "",
+        //             "basicauthenabled": true,
+        //             "basicauthuser": "default",
+        //             "jsondata": {
+        //                 "addCorsHeader": true,
+        //                 "compressionType": "gzip",
+        //                 "useCompression": true,
+        //                 "usePOST": true
+        //             },
+        //             "decryptedsecurejsondataMap": [
+        //                 ["basicAuthPassword", ""]
+        //             ],
+        //             "lastupdatedms": 1720528778000,
+        //             "uid": "P7E099F39B84EA795"
+        //         },
+        //         "headersMap": [
+        //             ["FromAlert", "true"],
+        //             ["X-Cache-Skip", "true"],
+        //             ["http_X-Grafana-Org-Id", "1"]
+        //         ],
+        //         "queriesList": [
+        //             {
+        //                 "refid": "A",
+        //                 "maxdatapoints": 43200,
+        //                 "intervalms": 1000,
+        //                 "timerange": {
+        //                     "fromepochms": 1720529132456,
+        //                     "toepochms": 1720529732456
+        //                 },
+        //                 "json": {
+        //                     "add_metadata": true,
+        //                     "database": "default",
+        //                     "datasource": {
+        //                         "type": "vertamedia-clickhouse-datasource",
+        //                         "uid": "P7E099F39B84EA795"
+        //                     },
+        //                     "dateColDataType": "EventDate",
+        //                     "dateTimeColDataType": "EventTime",
+        //                     "dateTimeType": "DATETIME",
+        //                     "editorMode": "builder",
+        //                     "extrapolate": true,
+        //                     "format": "table",
+        //                     "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+        //                     "hide": false,
+        //                     "interval": "",
+        //                     "intervalFactor": 1,
+        //                     "intervalMs": 1000,
+        //                     "maxDataPoints": 43200,
+        //                     "query": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
+        //                     "refId": "A",
+        //                     "round": "0s",
+        //                     "skip_comments": true,
+        //                     "table": "test_alerts"
+        //                 },
+        //                 "querytype": ""
+        //             }
+        //         ]
+        //     }
+        // }
 
         const context: InternalPluginContext.AsObject = request.plugincontext!;
         const response: QueryDataResponse = new QueryDataResponse();
@@ -224,7 +226,7 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
 
         try {
             if (request.plugincontext?.datasourceinstancesettings) {
-                for (let query of request.plugincontext.queriesList) {
+                for (let query of queriesList) {
                     const writer = new RecordBatchFileWriter()
                     const dataResponse: DataResponse = new DataResponse();
 
@@ -233,17 +235,8 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
                         query: query.json,
                     }
 
-                    const pluginContext = {
-                        ...context,
-                        datasourceinstancesettings: {
-                            ...context.datasourceinstancesettings!,
-                            json: context.datasourceinstancesettings.jsondata,
-                        }
-                    }
-
                     const dataFrame: any = await this.QueryData(request, pluginContext);
 
-                    console.log(dataFrame, '<<<<<')
                     writer.write(
                         tableFromArrays(
                             dataFrame.fields.reduce((acc,field) => {
