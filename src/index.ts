@@ -140,7 +140,7 @@ export interface PluginContext<T> extends InternalPluginContext.AsObject {
 }
 
 export abstract class DataService<Q,O> implements proto.IDataServer {
-    abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<DataFrame[]>;
+    abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<any[]>;
     async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
 
         const request = {

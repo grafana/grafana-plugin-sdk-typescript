@@ -2,7 +2,7 @@
   "name": "@grafana/tsbackend",
   "version": "1.0.0",
   "description": "Wrapper for writing a backend plugin in nodejs",
-  "main": "src/index.ts",
+  "main": "dist/index.js",
   "files": [
     "src/**/*"
   ],
@@ -44,6 +44,8 @@
     "webpack-cli": "^5.1.4"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.10.10",
+    "apache-arrow": "^16.1.0",
     "axios": "^1.7.2",
     "dayjs": "^1.11.11",
     "dns2": "2.1.0",
