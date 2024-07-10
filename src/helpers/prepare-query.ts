@@ -42,7 +42,7 @@ function base64Decode(data: string): any {
 
 export function processInputData(inputData: any) {
     const context = inputData.plugincontext;
-    throw new Error('Not implemented test '+ JSON.stringify(inputData))
+    // throw new Error('Not implemented test '+ JSON.stringify(inputData))
 
     // Decode the jsondata in datasourceinstancesettings
     const decodedDatasourceJson = context?.datasourceinstancesettings ? base64Decode(context.datasourceinstancesettings.jsondata) : {};
