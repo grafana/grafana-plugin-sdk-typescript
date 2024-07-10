@@ -145,7 +145,67 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
     async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
         // writeMessage('Query Data 333 '+ call.request.toObject())
         let request: QueryDataRequest.AsObject = call.request.toObject();
-        const {queriesList, pluginContext} = processInputData(request)
+        const {queriesList, pluginContext} = processInputData({
+            "plugincontext": {
+                "orgid": 1,
+                "pluginid": "vertamedia-clickhouse-datasource",
+                "user": {
+                    "login": "grafana_scheduler",
+                    "name": "grafana_scheduler",
+                    "email": "",
+                    "role": "Admin"
+                },
+                "datasourceinstancesettings": {
+                    "id": 1,
+                    "name": "clickhouse",
+                    "url": "http://clickhouse:8123",
+                    "user": "",
+                    "database": "",
+                    "basicauthenabled": true,
+                    "basicauthuser": "default",
+                    "jsondata": "eyJhZGRDb3JzSGVhZGVyIjp0cnVlLCJjb21wcmVzc2lvblR5cGUiOiJnemlwIiwidXNlQ29tcHJlc3Npb24iOnRydWUsInVzZVBPU1QiOnRydWV9",
+                    "decryptedsecurejsondataMap": [
+                        [
+                            "basicAuthPassword",
+                            ""
+                        ]
+                    ],
+                    "lastupdatedms": 1720650216000,
+                    "uid": "P7E099F39B84EA795"
+                }
+            },
+            "headersMap": [
+                [
+                    "FromAlert",
+                    "true"
+                ],
+                [
+                    "X-Cache-Skip",
+                    "true"
+                ],
+                [
+                    "X-Grafana-Org-Id",
+                    "1"
+                ],
+                [
+                    "X-Rule-Uid",
+                    "test_unified_alert"
+                ]
+            ],
+            "queriesList": [
+                {
+                    "refid": "A",
+                    "maxdatapoints": 43200,
+                    "intervalms": 1000,
+                    "timerange": {
+                        "fromepochms": 1720649620000,
+                        "toepochms": 1720650220000
+                    },
+                    "json": "eyJhZGRfbWV0YWRhdGEiOnRydWUsImRhdGFiYXNlIjoiZGVmYXVsdCIsImRhdGVDb2xEYXRhVHlwZSI6IiIsImRhdGVMb2FkaW5nIjpmYWxzZSwiZGF0ZVRpbWVDb2xEYXRhVHlwZSI6IkV2ZW50VGltZSIsImRhdGVUaW1lVHlwZSI6IkRBVEVUSU1FIiwiZGF0ZXRpbWVMb2FkaW5nIjpmYWxzZSwiZXh0cmFwb2xhdGUiOnRydWUsImZvcm1hdCI6InRpbWVfc2VyaWVzIiwiZm9ybWF0dGVkUXVlcnkiOiJTRUxFQ1QgJHRpbWVTZXJpZXMgYXMgdCwgTmFtZSwgY291bnQoKSBGUk9NICR0YWJsZSBXSEVSRSAkdGltZUZpbHRlciBHUk9VUCBCWSB0LE5hbWUgT1JERVIgQlkgdCxOYW1lIiwiaW50ZXJ2YWwiOiIiLCJpbnRlcnZhbEZhY3RvciI6MSwiaW50ZXJ2YWxNcyI6MTAwMCwibWF4RGF0YVBvaW50cyI6NDMyMDAsInF1ZXJ5IjoiU0VMRUNUXG4gICAgJHRpbWVTZXJpZXMgYXMgdCxcbiAgICBOYW1lLFxuICAgIHN1bShWYWx1ZSkgdlxuRlJPTSAkdGFibGVcblxuV0hFUkUgJHRpbWVGaWx0ZXJcblxuR1JPVVAgQlkgdCwgTmFtZVxuXG5PUkRFUiBCWSB0LCBOYW1lXG4iLCJyYXdRdWVyeSI6dHJ1ZSwicmVmSWQiOiJBIiwicm91bmQiOiIwcyIsInNraXBfY29tbWVudHMiOnRydWUsInRhYmxlIjoidGVzdF9hbGVydHMiLCJ0YWJsZUxvYWRpbmciOmZhbHNlfQ==",
+                    "querytype": ""
+                }
+            ]
+        })
         // const request = {
         //     "plugincontext": {
         //         "orgid": 1,
