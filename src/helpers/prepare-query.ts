@@ -48,7 +48,7 @@ export function processInputData(inputData: any) {
     const decodedDatasourceJson = context?.datasourceinstancesettings ? base64Decode(context.datasourceinstancesettings.jsondata) : {};
 
     // Decode the json field in each query in queriesList
-    const decodedQueriesList = context.queriesList.map(query => {
+    const decodedQueriesList = inputData.queriesList.map(query => {
         console.log({
             ...query,
             json: base64Decode(query.json)
