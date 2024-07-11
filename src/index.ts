@@ -257,6 +257,58 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
     }
 }
 
+export abstract class MockedDataService<Q,O> implements proto.IDataServer {
+    constructor(request) {
+        this.request = request
+    }
+    abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<any[]>;
+    async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
+        const {queriesList, pluginContext} = processInputData(this.request)
+        const context: InternalPluginContext.AsObject = this.request.plugincontext!;
+        const response: QueryDataResponse = new QueryDataResponse();
+        let err: grpc.ServiceError | null = null;
+        console.log(3, request, request.plugincontext?.datasourceinstancesettings)
+
+        try {
+            if (pluginContext?.datasourceinstancesettings) {
+                for (let query of queriesList) {
+                    const writer = new RecordBatchFileWriter()
+                    const dataResponse: DataResponse = new DataResponse();
+                    console.log(4)
+
+                    const request =  {
+                        ...query,
+                        query: query.json,
+                    }
+                    const dataFrame: any = await this.QueryData(request, pluginContext);
+
+                    writer.write(
+                        tableFromArrays(
+                            dataFrame.fields.reduce((acc,field) => {
+                                acc[field.name] = field.values;
+
+                                return acc
+                            }, {})
+                        )
+                    );
+
+                    writer.finish();
+                    const frames = await writer.toUint8Array();
+                    dataResponse.addFrames(frames);
+                    writer.close();
+                    response.getResponsesMap().set(query.refid, dataResponse);
+                }
+
+            }
+        } catch(ex: any) {
+            console.trace(ex)
+            err = ex;
+        }
+
+        callback(err, response);
+    }
+}
+
 export abstract class ResourceService implements proto.IResourceService {
     abstract CallResource(request: CallResourceRequest): Promise<CallResourceResponse>;
 
