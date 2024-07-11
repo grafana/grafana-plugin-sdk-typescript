@@ -143,27 +143,28 @@ export interface PluginContext<T> extends InternalPluginContext.AsObject {
 export abstract class DataService<Q,O> implements proto.IDataServer {
     abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<any[]>;
     async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
+        console.log(1)
         // writeMessage('Query Data 333 '+ call.request.toObject())
-        let request: QueryDataRequest.AsObject = call.request.toObject();
-        const {queriesList, pluginContext} = processInputData({
+        // let request: QueryDataRequest.AsObject = call.request.toObject();
+        const request = {
             "plugincontext": {
                 "orgid": 1,
                 "pluginid": "vertamedia-clickhouse-datasource",
                 "user": {
-                    "login": "grafana_scheduler",
-                    "name": "grafana_scheduler",
+                    "login": "",
+                    "name": "",
                     "email": "",
                     "role": "Admin"
                 },
                 "datasourceinstancesettings": {
                     "id": 1,
                     "name": "clickhouse",
-                    "url": "http://clickhouse:8123",
+                    "url": "http://localhost:8123",
                     "user": "",
                     "database": "",
                     "basicauthenabled": true,
                     "basicauthuser": "default",
-                    "jsondata": "eyJhZGRDb3JzSGVhZGVyIjp0cnVlLCJjb21wcmVzc2lvblR5cGUiOiJnemlwIiwidXNlQ29tcHJlc3Npb24iOnRydWUsInVzZVBPU1QiOnRydWV9",
+                    "jsondata": "eyJhZGRDb3JzSGVhZGVyIjp0cnVlLCJjb21wcmVzc2lvblR5cGUiOiJnemlwIiwiZ3JhZmFuYURhdGEiOnsiYWRkQ29yc0hlYWRlciI6dHJ1ZSwiY29tcHJlc3Npb25UeXBlIjoiZ3ppcCIsInVzZUNvbXByZXNzaW9uIjp0cnVlLCJ1c2VQT1NUIjp0cnVlfSwidXNlQ29tcHJlc3Npb24iOnRydWUsInVzZVBPU1QiOnRydWV9",
                     "decryptedsecurejsondataMap": [
                         [
                             "basicAuthPassword",
@@ -184,12 +185,8 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
                     "true"
                 ],
                 [
-                    "X-Grafana-Org-Id",
+                    "http_X-Grafana-Org-Id",
                     "1"
-                ],
-                [
-                    "X-Rule-Uid",
-                    "test_unified_alert"
                 ]
             ],
             "queriesList": [
@@ -197,106 +194,41 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
                     "refid": "A",
                     "maxdatapoints": 43200,
                     "intervalms": 1000,
+                    "interval": '30s',
                     "timerange": {
-                        "fromepochms": 1720649620000,
-                        "toepochms": 1720650220000
+                        "fromepochms": 1720649666790,
+                        "toepochms": 2720650266790
                     },
-                    "json": "eyJhZGRfbWV0YWRhdGEiOnRydWUsImRhdGFiYXNlIjoiZGVmYXVsdCIsImRhdGVDb2xEYXRhVHlwZSI6IiIsImRhdGVMb2FkaW5nIjpmYWxzZSwiZGF0ZVRpbWVDb2xEYXRhVHlwZSI6IkV2ZW50VGltZSIsImRhdGVUaW1lVHlwZSI6IkRBVEVUSU1FIiwiZGF0ZXRpbWVMb2FkaW5nIjpmYWxzZSwiZXh0cmFwb2xhdGUiOnRydWUsImZvcm1hdCI6InRpbWVfc2VyaWVzIiwiZm9ybWF0dGVkUXVlcnkiOiJTRUxFQ1QgJHRpbWVTZXJpZXMgYXMgdCwgTmFtZSwgY291bnQoKSBGUk9NICR0YWJsZSBXSEVSRSAkdGltZUZpbHRlciBHUk9VUCBCWSB0LE5hbWUgT1JERVIgQlkgdCxOYW1lIiwiaW50ZXJ2YWwiOiIiLCJpbnRlcnZhbEZhY3RvciI6MSwiaW50ZXJ2YWxNcyI6MTAwMCwibWF4RGF0YVBvaW50cyI6NDMyMDAsInF1ZXJ5IjoiU0VMRUNUXG4gICAgJHRpbWVTZXJpZXMgYXMgdCxcbiAgICBOYW1lLFxuICAgIHN1bShWYWx1ZSkgdlxuRlJPTSAkdGFibGVcblxuV0hFUkUgJHRpbWVGaWx0ZXJcblxuR1JPVVAgQlkgdCwgTmFtZVxuXG5PUkRFUiBCWSB0LCBOYW1lXG4iLCJyYXdRdWVyeSI6dHJ1ZSwicmVmSWQiOiJBIiwicm91bmQiOiIwcyIsInNraXBfY29tbWVudHMiOnRydWUsInRhYmxlIjoidGVzdF9hbGVydHMiLCJ0YWJsZUxvYWRpbmciOmZhbHNlfQ==",
+                    "json": "eyJhZGRfbWV0YWRhdGEiOnRydWUsImRhdGFiYXNlIjoiZGVmYXVsdCIsImRhdGVDb2xEYXRhVHlwZSI6IiIsImRhdGVMb2FkaW5nIjpmYWxzZSwiZGF0ZVRpbWVDb2xEYXRhVHlwZSI6IkV2ZW50VGltZSI sImRhdGVUaW1lVHlwZSI6IkRBVEVUSU1FIiwiZGF0ZXRpbWVMb2FkaW5nIjpmYWxzZSwiZXh0cmFwb2xhdGUiOnRydWUsImZvcm1hdCI6InRpbWVfc2VyaWVzIiwiZm9ybWF0dGVkUXVlcnkiOiJTRUxFQ1QgJHRpbWVTZXJpZXMgYXMgdCwgTmFtZSwgY291bnQoKSBGUk9NICR0YWJsZSBXSEVSRSAkdGltZUZpbHRlciBHUk9VUCBCWSB0LE5hbWUgT1JERVIgQlkgdCxOYW1lIiwiaW50ZXJ2YWwiOiIiLCJpbnRlcnZhbEZhY3RvciI6MSwiaW50ZXJ2YWxNcyI6MTAwMCwibWF4RGF0YVBvaW50cyI6NDMyMDAsInF1ZXJ5IjoiU0VMRUNUXG4gICAgJHRpbWVTZXJpZXMgYXMgdCxcbiAgICBOYW1lLFxuICAgIHN1bShWYWx1ZSkgdlxuRlJPTSAkdGFibGVcblxuV0hFUkUgJHRpbWVGaWx0ZXJcblxuR1JPVVA gQlkgdCwgTmFtZVxuXG5PUkRFUiBCWSB0LCBOYW1lXG4iLCJyYXdRdWVyeSI6dHJ1ZSwicmVmSWQiOiJBIiwicm91bmQiOiIwcyIsInNraXBfY29tbWVudHMiOnRydWUsInRhYmxlIjoidGVzdF9hbGVydHMiLCJ0YWJsZUxvYWRpbmc iOmZhbHNlfQ==",
                     "querytype": ""
                 }
             ]
-        })
-        // const request = {
-        //     "plugincontext": {
-        //         "orgid": 1,
-        //         "pluginid": "vertamedia-clickhouse-datasource",
-        //         "user": {
-        //             "login": "",
-        //             "name": "",
-        //             "email": "",
-        //             "role": "Admin"
-        //         },
-        //         "datasourceinstancesettings": {
-        //             "id": 5,
-        //             "name": "clickhouse",
-        //             "url": "http://clickhouse:8123",
-        //             "user": "",
-        //             "database": "",
-        //             "basicauthenabled": true,
-        //             "basicauthuser": "default",
-        //             "jsondata": {
-        //                 "addCorsHeader": true,
-        //                 "compressionType": "gzip",
-        //                 "useCompression": true,
-        //                 "usePOST": true
-        //             },
-        //             "decryptedsecurejsondataMap": [
-        //                 ["basicAuthPassword", ""]
-        //             ],
-        //             "lastupdatedms": 1720528778000,
-        //             "uid": "P7E099F39B84EA795"
-        //         },
-        //         "headersMap": [
-        //             ["FromAlert", "true"],
-        //             ["X-Cache-Skip", "true"],
-        //             ["http_X-Grafana-Org-Id", "1"]
-        //         ],
-        //         "queriesList": [
-        //             {
-        //                 "refid": "A",
-        //                 "maxdatapoints": 43200,
-        //                 "intervalms": 1000,
-        //                 "timerange": {
-        //                     "fromepochms": 1720529132456,
-        //                     "toepochms": 1720529732456
-        //                 },
-        //                 "json": {
-        //                     "add_metadata": true,
-        //                     "database": "default",
-        //                     "datasource": {
-        //                         "type": "vertamedia-clickhouse-datasource",
-        //                         "uid": "P7E099F39B84EA795"
-        //                     },
-        //                     "dateColDataType": "EventDate",
-        //                     "dateTimeColDataType": "EventTime",
-        //                     "dateTimeType": "DATETIME",
-        //                     "editorMode": "builder",
-        //                     "extrapolate": true,
-        //                     "format": "table",
-        //                     "formattedQuery": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-        //                     "hide": false,
-        //                     "interval": "",
-        //                     "intervalFactor": 1,
-        //                     "intervalMs": 1000,
-        //                     "maxDataPoints": 43200,
-        //                     "query": "SELECT $timeSeries as t, count() FROM $table WHERE $timeFilter GROUP BY t ORDER BY t",
-        //                     "refId": "A",
-        //                     "round": "0s",
-        //                     "skip_comments": true,
-        //                     "table": "test_alerts"
-        //                 },
-        //                 "querytype": ""
-        //             }
-        //         ]
-        //     }
-        // }
+        }
+        const {queriesList, pluginContext} = processInputData(request)
+
+        console.log(2)
 
         const context: InternalPluginContext.AsObject = request.plugincontext!;
         const response: QueryDataResponse = new QueryDataResponse();
         let err: grpc.ServiceError | null = null;
+        console.log(3, request, request.plugincontext?.datasourceinstancesettings)
 
         try {
-            if (request.plugincontext?.datasourceinstancesettings) {
+            if (pluginContext?.datasourceinstancesettings) {
                 for (let query of queriesList) {
                     const writer = new RecordBatchFileWriter()
                     const dataResponse: DataResponse = new DataResponse();
+                    console.log(4)
 
                     const request =  {
                         ...query,
                         query: query.json,
                     }
+                    console.log(5)
 
                     const dataFrame: any = await this.QueryData(request, pluginContext);
+
+                    console.log(6)
 
                     writer.write(
                         tableFromArrays(
