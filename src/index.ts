@@ -145,65 +145,65 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
     async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
         console.log(1)
         // writeMessage('Query Data 333 '+ call.request.toObject())
-        // let request: QueryDataRequest.AsObject = call.request.toObject();
-        const request = {
-            "plugincontext": {
-                "orgid": 1,
-                "pluginid": "vertamedia-clickhouse-datasource",
-                "user": {
-                    "login": "",
-                    "name": "",
-                    "email": "",
-                    "role": "Admin"
-                },
-                "datasourceinstancesettings": {
-                    "id": 1,
-                    "name": "clickhouse",
-                    "url": "http://localhost:8123",
-                    "user": "",
-                    "database": "",
-                    "basicauthenabled": true,
-                    "basicauthuser": "default",
-                    "jsondata": "eyJhZGRDb3JzSGVhZGVyIjp0cnVlLCJjb21wcmVzc2lvblR5cGUiOiJnemlwIiwiZ3JhZmFuYURhdGEiOnsiYWRkQ29yc0hlYWRlciI6dHJ1ZSwiY29tcHJlc3Npb25UeXBlIjoiZ3ppcCIsInVzZUNvbXByZXNzaW9uIjp0cnVlLCJ1c2VQT1NUIjp0cnVlfSwidXNlQ29tcHJlc3Npb24iOnRydWUsInVzZVBPU1QiOnRydWV9",
-                    "decryptedsecurejsondataMap": [
-                        [
-                            "basicAuthPassword",
-                            ""
-                        ]
-                    ],
-                    "lastupdatedms": 1720650216000,
-                    "uid": "P7E099F39B84EA795"
-                }
-            },
-            "headersMap": [
-                [
-                    "FromAlert",
-                    "true"
-                ],
-                [
-                    "X-Cache-Skip",
-                    "true"
-                ],
-                [
-                    "http_X-Grafana-Org-Id",
-                    "1"
-                ]
-            ],
-            "queriesList": [
-                {
-                    "refid": "A",
-                    "maxdatapoints": 43200,
-                    "intervalms": 1000,
-                    "interval": '30s',
-                    "timerange": {
-                        "fromepochms": 1720649666790,
-                        "toepochms": 2720650266790
-                    },
-                    "json": "eyJhZGRfbWV0YWRhdGEiOnRydWUsImRhdGFiYXNlIjoiZGVmYXVsdCIsImRhdGVDb2xEYXRhVHlwZSI6IiIsImRhdGVMb2FkaW5nIjpmYWxzZSwiZGF0ZVRpbWVDb2xEYXRhVHlwZSI6IkV2ZW50VGltZSI sImRhdGVUaW1lVHlwZSI6IkRBVEVUSU1FIiwiZGF0ZXRpbWVMb2FkaW5nIjpmYWxzZSwiZXh0cmFwb2xhdGUiOnRydWUsImZvcm1hdCI6InRpbWVfc2VyaWVzIiwiZm9ybWF0dGVkUXVlcnkiOiJTRUxFQ1QgJHRpbWVTZXJpZXMgYXMgdCwgTmFtZSwgY291bnQoKSBGUk9NICR0YWJsZSBXSEVSRSAkdGltZUZpbHRlciBHUk9VUCBCWSB0LE5hbWUgT1JERVIgQlkgdCxOYW1lIiwiaW50ZXJ2YWwiOiIiLCJpbnRlcnZhbEZhY3RvciI6MSwiaW50ZXJ2YWxNcyI6MTAwMCwibWF4RGF0YVBvaW50cyI6NDMyMDAsInF1ZXJ5IjoiU0VMRUNUXG4gICAgJHRpbWVTZXJpZXMgYXMgdCxcbiAgICBOYW1lLFxuICAgIHN1bShWYWx1ZSkgdlxuRlJPTSAkdGFibGVcblxuV0hFUkUgJHRpbWVGaWx0ZXJcblxuR1JPVVA gQlkgdCwgTmFtZVxuXG5PUkRFUiBCWSB0LCBOYW1lXG4iLCJyYXdRdWVyeSI6dHJ1ZSwicmVmSWQiOiJBIiwicm91bmQiOiIwcyIsInNraXBfY29tbWVudHMiOnRydWUsInRhYmxlIjoidGVzdF9hbGVydHMiLCJ0YWJsZUxvYWRpbmc iOmZhbHNlfQ==",
-                    "querytype": ""
-                }
-            ]
-        }
+        let request: QueryDataRequest.AsObject = call.request.toObject();
+        // const request = {
+        //     "plugincontext": {
+        //         "orgid": 1,
+        //         "pluginid": "vertamedia-clickhouse-datasource",
+        //         "user": {
+        //             "login": "",
+        //             "name": "",
+        //             "email": "",
+        //             "role": "Admin"
+        //         },
+        //         "datasourceinstancesettings": {
+        //             "id": 1,
+        //             "name": "clickhouse",
+        //             "url": "http://localhost:8123",
+        //             "user": "",
+        //             "database": "",
+        //             "basicauthenabled": true,
+        //             "basicauthuser": "default",
+        //             "jsondata": "eyJhZGRDb3JzSGVhZGVyIjp0cnVlLCJjb21wcmVzc2lvblR5cGUiOiJnemlwIiwiZ3JhZmFuYURhdGEiOnsiYWRkQ29yc0hlYWRlciI6dHJ1ZSwiY29tcHJlc3Npb25UeXBlIjoiZ3ppcCIsInVzZUNvbXByZXNzaW9uIjp0cnVlLCJ1c2VQT1NUIjp0cnVlfSwidXNlQ29tcHJlc3Npb24iOnRydWUsInVzZVBPU1QiOnRydWV9",
+        //             "decryptedsecurejsondataMap": [
+        //                 [
+        //                     "basicAuthPassword",
+        //                     ""
+        //                 ]
+        //             ],
+        //             "lastupdatedms": 1720650216000,
+        //             "uid": "P7E099F39B84EA795"
+        //         }
+        //     },
+        //     "headersMap": [
+        //         [
+        //             "FromAlert",
+        //             "true"
+        //         ],
+        //         [
+        //             "X-Cache-Skip",
+        //             "true"
+        //         ],
+        //         [
+        //             "http_X-Grafana-Org-Id",
+        //             "1"
+        //         ]
+        //     ],
+        //     "queriesList": [
+        //         {
+        //             "refid": "A",
+        //             "maxdatapoints": 43200,
+        //             "intervalms": 1000,
+        //             "interval": '30s',
+        //             "timerange": {
+        //                 "fromepochms": 1720649666790,
+        //                 "toepochms": 2720650266790
+        //             },
+        //             "json": "eyJhZGRfbWV0YWRhdGEiOnRydWUsImRhdGFiYXNlIjoiZGVmYXVsdCIsImRhdGVDb2xEYXRhVHlwZSI6IiIsImRhdGVMb2FkaW5nIjpmYWxzZSwiZGF0ZVRpbWVDb2xEYXRhVHlwZSI6IkV2ZW50VGltZSI sImRhdGVUaW1lVHlwZSI6IkRBVEVUSU1FIiwiZGF0ZXRpbWVMb2FkaW5nIjpmYWxzZSwiZXh0cmFwb2xhdGUiOnRydWUsImZvcm1hdCI6InRpbWVfc2VyaWVzIiwiZm9ybWF0dGVkUXVlcnkiOiJTRUxFQ1QgJHRpbWVTZXJpZXMgYXMgdCwgTmFtZSwgY291bnQoKSBGUk9NICR0YWJsZSBXSEVSRSAkdGltZUZpbHRlciBHUk9VUCBCWSB0LE5hbWUgT1JERVIgQlkgdCxOYW1lIiwiaW50ZXJ2YWwiOiIiLCJpbnRlcnZhbEZhY3RvciI6MSwiaW50ZXJ2YWxNcyI6MTAwMCwibWF4RGF0YVBvaW50cyI6NDMyMDAsInF1ZXJ5IjoiU0VMRUNUXG4gICAgJHRpbWVTZXJpZXMgYXMgdCxcbiAgICBOYW1lLFxuICAgIHN1bShWYWx1ZSkgdlxuRlJPTSAkdGFibGVcblxuV0hFUkUgJHRpbWVGaWx0ZXJcblxuR1JPVVA gQlkgdCwgTmFtZVxuXG5PUkRFUiBCWSB0LCBOYW1lXG4iLCJyYXdRdWVyeSI6dHJ1ZSwicmVmSWQiOiJBIiwicm91bmQiOiIwcyIsInNraXBfY29tbWVudHMiOnRydWUsInRhYmxlIjoidGVzdF9hbGVydHMiLCJ0YWJsZUxvYWRpbmc iOmZhbHNlfQ==",
+        //             "querytype": ""
+        //         }
+        //     ]
+        // }
         const {queriesList, pluginContext} = processInputData(request)
 
         console.log(2)
