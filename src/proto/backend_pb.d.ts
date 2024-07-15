@@ -14,6 +14,9 @@ export class AppInstanceSettings extends jspb.Message {
   getLastupdatedms(): number;
   setLastupdatedms(value: number): void;
 
+  getApiversion(): string;
+  setApiversion(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): AppInstanceSettings.AsObject;
   static toObject(includeInstance: boolean, msg: AppInstanceSettings): AppInstanceSettings.AsObject;
@@ -29,6 +32,7 @@ export namespace AppInstanceSettings {
     jsondata: Uint8Array | string,
     decryptedsecurejsondataMap: Array<[string, string]>,
     lastupdatedms: number,
+    apiversion: string,
   }
 }
 
@@ -67,6 +71,9 @@ export class DataSourceInstanceSettings extends jspb.Message {
   getUid(): string;
   setUid(value: string): void;
 
+  getApiversion(): string;
+  setApiversion(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): DataSourceInstanceSettings.AsObject;
   static toObject(includeInstance: boolean, msg: DataSourceInstanceSettings): DataSourceInstanceSettings.AsObject;
@@ -90,6 +97,7 @@ export namespace DataSourceInstanceSettings {
     decryptedsecurejsondataMap: Array<[string, string]>,
     lastupdatedms: number,
     uid: string,
+    apiversion: string,
   }
 }
 
@@ -147,6 +155,17 @@ export class PluginContext extends jspb.Message {
   getDatasourceinstancesettings(): DataSourceInstanceSettings | undefined;
   setDatasourceinstancesettings(value?: DataSourceInstanceSettings): void;
 
+  getGrafanaconfigMap(): jspb.Map<string, string>;
+  clearGrafanaconfigMap(): void;
+  getPluginversion(): string;
+  setPluginversion(value: string): void;
+
+  getUseragent(): string;
+  setUseragent(value: string): void;
+
+  getApiversion(): string;
+  setApiversion(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): PluginContext.AsObject;
   static toObject(includeInstance: boolean, msg: PluginContext): PluginContext.AsObject;
@@ -164,6 +183,10 @@ export namespace PluginContext {
     user?: User.AsObject,
     appinstancesettings?: AppInstanceSettings.AsObject,
     datasourceinstancesettings?: DataSourceInstanceSettings.AsObject,
+    grafanaconfigMap: Array<[string, string]>,
+    pluginversion: string,
+    useragent: string,
+    apiversion: string,
   }
 }
 
@@ -395,6 +418,12 @@ export class DataResponse extends jspb.Message {
   getJsonmeta_asB64(): string;
   setJsonmeta(value: Uint8Array | string): void;
 
+  getStatus(): number;
+  setStatus(value: number): void;
+
+  getErrorsource(): string;
+  setErrorsource(value: string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): DataResponse.AsObject;
   static toObject(includeInstance: boolean, msg: DataResponse): DataResponse.AsObject;
@@ -410,6 +439,8 @@ export namespace DataResponse {
     framesList: Array<Uint8Array | string>,
     error: string,
     jsonmeta: Uint8Array | string,
+    status: number,
+    errorsource: string,
   }
 }
 
@@ -485,6 +516,8 @@ export class CheckHealthRequest extends jspb.Message {
   getPlugincontext(): PluginContext | undefined;
   setPlugincontext(value?: PluginContext): void;
 
+  getHeadersMap(): jspb.Map<string, string>;
+  clearHeadersMap(): void;
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): CheckHealthRequest.AsObject;
   static toObject(includeInstance: boolean, msg: CheckHealthRequest): CheckHealthRequest.AsObject;
@@ -498,6 +531,7 @@ export class CheckHealthRequest extends jspb.Message {
 export namespace CheckHealthRequest {
   export type AsObject = {
     plugincontext?: PluginContext.AsObject,
+    headersMap: Array<[string, string]>,
   }
 }
 
@@ -546,6 +580,11 @@ export class SubscribeStreamRequest extends jspb.Message {
   getPath(): string;
   setPath(value: string): void;
 
+  getData(): Uint8Array | string;
+  getData_asU8(): Uint8Array;
+  getData_asB64(): string;
+  setData(value: Uint8Array | string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): SubscribeStreamRequest.AsObject;
   static toObject(includeInstance: boolean, msg: SubscribeStreamRequest): SubscribeStreamRequest.AsObject;
@@ -560,6 +599,7 @@ export namespace SubscribeStreamRequest {
   export type AsObject = {
     plugincontext?: PluginContext.AsObject,
     path: string,
+    data: Uint8Array | string,
   }
 }
 
@@ -668,6 +708,11 @@ export class RunStreamRequest extends jspb.Message {
   getPath(): string;
   setPath(value: string): void;
 
+  getData(): Uint8Array | string;
+  getData_asU8(): Uint8Array;
+  getData_asB64(): string;
+  setData(value: Uint8Array | string): void;
+
   serializeBinary(): Uint8Array;
   toObject(includeInstance?: boolean): RunStreamRequest.AsObject;
   static toObject(includeInstance: boolean, msg: RunStreamRequest): RunStreamRequest.AsObject;
@@ -682,6 +727,7 @@ export namespace RunStreamRequest {
   export type AsObject = {
     plugincontext?: PluginContext.AsObject,
     path: string,
+    data: Uint8Array | string,
   }
 }
 
@@ -704,6 +750,256 @@ export class StreamPacket extends jspb.Message {
 export namespace StreamPacket {
   export type AsObject = {
     data: Uint8Array | string,
+  }
+}
+
+export class GroupVersionKind extends jspb.Message {
+  getGroup(): string;
+  setGroup(value: string): void;
+
+  getVersion(): string;
+  setVersion(value: string): void;
+
+  getKind(): string;
+  setKind(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): GroupVersionKind.AsObject;
+  static toObject(includeInstance: boolean, msg: GroupVersionKind): GroupVersionKind.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: GroupVersionKind, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): GroupVersionKind;
+  static deserializeBinaryFromReader(message: GroupVersionKind, reader: jspb.BinaryReader): GroupVersionKind;
+}
+
+export namespace GroupVersionKind {
+  export type AsObject = {
+    group: string,
+    version: string,
+    kind: string,
+  }
+}
+
+export class AdmissionRequest extends jspb.Message {
+  hasPlugincontext(): boolean;
+  clearPlugincontext(): void;
+  getPlugincontext(): PluginContext | undefined;
+  setPlugincontext(value?: PluginContext): void;
+
+  getOperation(): AdmissionRequest.Operation;
+  setOperation(value: AdmissionRequest.Operation): void;
+
+  hasKind(): boolean;
+  clearKind(): void;
+  getKind(): GroupVersionKind | undefined;
+  setKind(value?: GroupVersionKind): void;
+
+  getObjectBytes(): Uint8Array | string;
+  getObjectBytes_asU8(): Uint8Array;
+  getObjectBytes_asB64(): string;
+  setObjectBytes(value: Uint8Array | string): void;
+
+  getOldObjectBytes(): Uint8Array | string;
+  getOldObjectBytes_asU8(): Uint8Array;
+  getOldObjectBytes_asB64(): string;
+  setOldObjectBytes(value: Uint8Array | string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): AdmissionRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: AdmissionRequest): AdmissionRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: AdmissionRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): AdmissionRequest;
+  static deserializeBinaryFromReader(message: AdmissionRequest, reader: jspb.BinaryReader): AdmissionRequest;
+}
+
+export namespace AdmissionRequest {
+  export type AsObject = {
+    plugincontext?: PluginContext.AsObject,
+    operation: AdmissionRequest.Operation,
+    kind?: GroupVersionKind.AsObject,
+    objectBytes: Uint8Array | string,
+    oldObjectBytes: Uint8Array | string,
+  }
+
+  export enum Operation {
+    CREATE = 0,
+    UPDATE = 1,
+    DELETE = 2,
+  }
+}
+
+export class ConversionRequest extends jspb.Message {
+  hasPlugincontext(): boolean;
+  clearPlugincontext(): void;
+  getPlugincontext(): PluginContext | undefined;
+  setPlugincontext(value?: PluginContext): void;
+
+  hasKind(): boolean;
+  clearKind(): void;
+  getKind(): GroupVersionKind | undefined;
+  setKind(value?: GroupVersionKind): void;
+
+  getObjectBytes(): Uint8Array | string;
+  getObjectBytes_asU8(): Uint8Array;
+  getObjectBytes_asB64(): string;
+  setObjectBytes(value: Uint8Array | string): void;
+
+  getTargetVersion(): string;
+  setTargetVersion(value: string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConversionRequest.AsObject;
+  static toObject(includeInstance: boolean, msg: ConversionRequest): ConversionRequest.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ConversionRequest, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConversionRequest;
+  static deserializeBinaryFromReader(message: ConversionRequest, reader: jspb.BinaryReader): ConversionRequest;
+}
+
+export namespace ConversionRequest {
+  export type AsObject = {
+    plugincontext?: PluginContext.AsObject,
+    kind?: GroupVersionKind.AsObject,
+    objectBytes: Uint8Array | string,
+    targetVersion: string,
+  }
+}
+
+export class ValidationResponse extends jspb.Message {
+  getAllowed(): boolean;
+  setAllowed(value: boolean): void;
+
+  hasResult(): boolean;
+  clearResult(): void;
+  getResult(): StatusResult | undefined;
+  setResult(value?: StatusResult): void;
+
+  clearWarningsList(): void;
+  getWarningsList(): Array<string>;
+  setWarningsList(value: Array<string>): void;
+  addWarnings(value: string, index?: number): string;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ValidationResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: ValidationResponse): ValidationResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ValidationResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ValidationResponse;
+  static deserializeBinaryFromReader(message: ValidationResponse, reader: jspb.BinaryReader): ValidationResponse;
+}
+
+export namespace ValidationResponse {
+  export type AsObject = {
+    allowed: boolean,
+    result?: StatusResult.AsObject,
+    warningsList: Array<string>,
+  }
+}
+
+export class MutationResponse extends jspb.Message {
+  getAllowed(): boolean;
+  setAllowed(value: boolean): void;
+
+  hasResult(): boolean;
+  clearResult(): void;
+  getResult(): StatusResult | undefined;
+  setResult(value?: StatusResult): void;
+
+  clearWarningsList(): void;
+  getWarningsList(): Array<string>;
+  setWarningsList(value: Array<string>): void;
+  addWarnings(value: string, index?: number): string;
+
+  getObjectBytes(): Uint8Array | string;
+  getObjectBytes_asU8(): Uint8Array;
+  getObjectBytes_asB64(): string;
+  setObjectBytes(value: Uint8Array | string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): MutationResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: MutationResponse): MutationResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: MutationResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): MutationResponse;
+  static deserializeBinaryFromReader(message: MutationResponse, reader: jspb.BinaryReader): MutationResponse;
+}
+
+export namespace MutationResponse {
+  export type AsObject = {
+    allowed: boolean,
+    result?: StatusResult.AsObject,
+    warningsList: Array<string>,
+    objectBytes: Uint8Array | string,
+  }
+}
+
+export class ConversionResponse extends jspb.Message {
+  getAllowed(): boolean;
+  setAllowed(value: boolean): void;
+
+  hasResult(): boolean;
+  clearResult(): void;
+  getResult(): StatusResult | undefined;
+  setResult(value?: StatusResult): void;
+
+  getObjectBytes(): Uint8Array | string;
+  getObjectBytes_asU8(): Uint8Array;
+  getObjectBytes_asB64(): string;
+  setObjectBytes(value: Uint8Array | string): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): ConversionResponse.AsObject;
+  static toObject(includeInstance: boolean, msg: ConversionResponse): ConversionResponse.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: ConversionResponse, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): ConversionResponse;
+  static deserializeBinaryFromReader(message: ConversionResponse, reader: jspb.BinaryReader): ConversionResponse;
+}
+
+export namespace ConversionResponse {
+  export type AsObject = {
+    allowed: boolean,
+    result?: StatusResult.AsObject,
+    objectBytes: Uint8Array | string,
+  }
+}
+
+export class StatusResult extends jspb.Message {
+  getStatus(): string;
+  setStatus(value: string): void;
+
+  getMessage(): string;
+  setMessage(value: string): void;
+
+  getReason(): string;
+  setReason(value: string): void;
+
+  getCode(): number;
+  setCode(value: number): void;
+
+  serializeBinary(): Uint8Array;
+  toObject(includeInstance?: boolean): StatusResult.AsObject;
+  static toObject(includeInstance: boolean, msg: StatusResult): StatusResult.AsObject;
+  static extensions: {[key: number]: jspb.ExtensionFieldInfo<jspb.Message>};
+  static extensionsBinary: {[key: number]: jspb.ExtensionFieldBinaryInfo<jspb.Message>};
+  static serializeBinaryToWriter(message: StatusResult, writer: jspb.BinaryWriter): void;
+  static deserializeBinary(bytes: Uint8Array): StatusResult;
+  static deserializeBinaryFromReader(message: StatusResult, reader: jspb.BinaryReader): StatusResult;
+}
+
+export namespace StatusResult {
+  export type AsObject = {
+    status: string,
+    message: string,
+    reason: string,
+    code: number,
   }
 }
 

@@ -4,6 +4,17 @@
 var grpc = require('@grpc/grpc-js');
 var backend_pb = require('./backend_pb.js');
 
+function serialize_pluginv2_AdmissionRequest(arg) {
+  if (!(arg instanceof backend_pb.AdmissionRequest)) {
+    throw new Error('Expected argument of type pluginv2.AdmissionRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_AdmissionRequest(buffer_arg) {
+  return backend_pb.AdmissionRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 function serialize_pluginv2_CallResourceRequest(arg) {
   if (!(arg instanceof backend_pb.CallResourceRequest)) {
     throw new Error('Expected argument of type pluginv2.CallResourceRequest');
@@ -68,6 +79,39 @@ function serialize_pluginv2_CollectMetricsResponse(arg) {
 
 function deserialize_pluginv2_CollectMetricsResponse(buffer_arg) {
   return backend_pb.CollectMetricsResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_pluginv2_ConversionRequest(arg) {
+  if (!(arg instanceof backend_pb.ConversionRequest)) {
+    throw new Error('Expected argument of type pluginv2.ConversionRequest');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_ConversionRequest(buffer_arg) {
+  return backend_pb.ConversionRequest.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_pluginv2_ConversionResponse(arg) {
+  if (!(arg instanceof backend_pb.ConversionResponse)) {
+    throw new Error('Expected argument of type pluginv2.ConversionResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_ConversionResponse(buffer_arg) {
+  return backend_pb.ConversionResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
+function serialize_pluginv2_MutationResponse(arg) {
+  if (!(arg instanceof backend_pb.MutationResponse)) {
+    throw new Error('Expected argument of type pluginv2.MutationResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_MutationResponse(buffer_arg) {
+  return backend_pb.MutationResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
 function serialize_pluginv2_PublishStreamRequest(arg) {
@@ -158,6 +202,17 @@ function deserialize_pluginv2_SubscribeStreamResponse(buffer_arg) {
   return backend_pb.SubscribeStreamResponse.deserializeBinary(new Uint8Array(buffer_arg));
 }
 
+function serialize_pluginv2_ValidationResponse(arg) {
+  if (!(arg instanceof backend_pb.ValidationResponse)) {
+    throw new Error('Expected argument of type pluginv2.ValidationResponse');
+  }
+  return Buffer.from(arg.serializeBinary());
+}
+
+function deserialize_pluginv2_ValidationResponse(buffer_arg) {
+  return backend_pb.ValidationResponse.deserializeBinary(new Uint8Array(buffer_arg));
+}
+
 
 // ---------------------------------------------------------
 // Resource service enables HTTP-style requests over gRPC.
@@ -228,14 +283,14 @@ var DiagnosticsService = exports.DiagnosticsService = {
 
 exports.DiagnosticsClient = grpc.makeGenericClientConstructor(DiagnosticsService);
 // -----------------------------------------------------------------
-// Stream -- EXPERIMENTAL and is subject to change until 8.0
+// Stream
 // -----------------------------------------------------------------
 //
 var StreamService = exports.StreamService = {
   // SubscribeStream called when a user tries to subscribe to a plugin/datasource
 // managed channel path – thus plugin can check subscribe permissions and communicate
 // options with Grafana Core. When the first subscriber joins a channel, RunStream
-// will be called. 
+// will be called.
 subscribeStream: {
     path: '/pluginv2.Stream/SubscribeStream',
     requestStream: false,
@@ -280,3 +335,51 @@ publishStream: {
 };
 
 exports.StreamClient = grpc.makeGenericClientConstructor(StreamService);
+// -----------------------------------------------------------------
+// AdmissionControl -- EXPERIMENTAL and is subject to change until 12.??
+// -----------------------------------------------------------------
+//
+// Admission control is a service based on the kubernetes admission webhook patterns.
+// This service can be used to verify if objects are valid and convert between versions
+// See: https://github.com/kubernetes/kubernetes/blob/v1.30.0/pkg/apis/admission/types.go#L41
+// And: https://github.com/grafana/grafana-app-sdk/blob/main/resource/admission.go#L14
+var AdmissionControlService = exports.AdmissionControlService = {
+  // Validate a resource -- the response is a simple yes/no
+validateAdmission: {
+    path: '/pluginv2.AdmissionControl/ValidateAdmission',
+    requestStream: false,
+    responseStream: false,
+    requestType: backend_pb.AdmissionRequest,
+    responseType: backend_pb.ValidationResponse,
+    requestSerialize: serialize_pluginv2_AdmissionRequest,
+    requestDeserialize: deserialize_pluginv2_AdmissionRequest,
+    responseSerialize: serialize_pluginv2_ValidationResponse,
+    responseDeserialize: deserialize_pluginv2_ValidationResponse,
+  },
+  // Return a modified copy of the request that can be saved or a descriptive error
+mutateAdmission: {
+    path: '/pluginv2.AdmissionControl/MutateAdmission',
+    requestStream: false,
+    responseStream: false,
+    requestType: backend_pb.AdmissionRequest,
+    responseType: backend_pb.MutationResponse,
+    requestSerialize: serialize_pluginv2_AdmissionRequest,
+    requestDeserialize: deserialize_pluginv2_AdmissionRequest,
+    responseSerialize: serialize_pluginv2_MutationResponse,
+    responseDeserialize: deserialize_pluginv2_MutationResponse,
+  },
+  // Convert a resource to a new version
+convertObject: {
+    path: '/pluginv2.AdmissionControl/ConvertObject',
+    requestStream: false,
+    responseStream: false,
+    requestType: backend_pb.ConversionRequest,
+    responseType: backend_pb.ConversionResponse,
+    requestSerialize: serialize_pluginv2_ConversionRequest,
+    requestDeserialize: deserialize_pluginv2_ConversionRequest,
+    responseSerialize: serialize_pluginv2_ConversionResponse,
+    responseDeserialize: deserialize_pluginv2_ConversionResponse,
+  },
+};
+
+exports.AdmissionControlClient = grpc.makeGenericClientConstructor(AdmissionControlService);

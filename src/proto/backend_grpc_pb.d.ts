@@ -182,3 +182,71 @@ export class StreamClient extends grpc.Client implements IStreamClient {
   public publishStream(request: backend_pb.PublishStreamRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: backend_pb.PublishStreamResponse) => void): grpc.ClientUnaryCall;
 }
 
+interface IAdmissionControlService extends grpc.ServiceDefinition<grpc.UntypedServiceImplementation> {
+  validateAdmission: IAdmissionControlService_IValidateAdmission;
+  mutateAdmission: IAdmissionControlService_IMutateAdmission;
+  convertObject: IAdmissionControlService_IConvertObject;
+}
+
+interface IAdmissionControlService_IValidateAdmission extends grpc.MethodDefinition<backend_pb.AdmissionRequest, backend_pb.ValidationResponse> {
+  path: '/pluginv2.AdmissionControl/ValidateAdmission'
+  requestStream: false
+  responseStream: false
+  requestSerialize: grpc.serialize<backend_pb.AdmissionRequest>;
+  requestDeserialize: grpc.deserialize<backend_pb.AdmissionRequest>;
+  responseSerialize: grpc.serialize<backend_pb.ValidationResponse>;
+  responseDeserialize: grpc.deserialize<backend_pb.ValidationResponse>;
+}
+
+interface IAdmissionControlService_IMutateAdmission extends grpc.MethodDefinition<backend_pb.AdmissionRequest, backend_pb.MutationResponse> {
+  path: '/pluginv2.AdmissionControl/MutateAdmission'
+  requestStream: false
+  responseStream: false
+  requestSerialize: grpc.serialize<backend_pb.AdmissionRequest>;
+  requestDeserialize: grpc.deserialize<backend_pb.AdmissionRequest>;
+  responseSerialize: grpc.serialize<backend_pb.MutationResponse>;
+  responseDeserialize: grpc.deserialize<backend_pb.MutationResponse>;
+}
+
+interface IAdmissionControlService_IConvertObject extends grpc.MethodDefinition<backend_pb.ConversionRequest, backend_pb.ConversionResponse> {
+  path: '/pluginv2.AdmissionControl/ConvertObject'
+  requestStream: false
+  responseStream: false
+  requestSerialize: grpc.serialize<backend_pb.ConversionRequest>;
+  requestDeserialize: grpc.deserialize<backend_pb.ConversionRequest>;
+  responseSerialize: grpc.serialize<backend_pb.ConversionResponse>;
+  responseDeserialize: grpc.deserialize<backend_pb.ConversionResponse>;
+}
+
+export const AdmissionControlService: IAdmissionControlService;
+export interface IAdmissionControlServer extends grpc.UntypedServiceImplementation {
+  validateAdmission: grpc.handleUnaryCall<backend_pb.AdmissionRequest, backend_pb.ValidationResponse>;
+  mutateAdmission: grpc.handleUnaryCall<backend_pb.AdmissionRequest, backend_pb.MutationResponse>;
+  convertObject: grpc.handleUnaryCall<backend_pb.ConversionRequest, backend_pb.ConversionResponse>;
+}
+
+export interface IAdmissionControlClient {
+  validateAdmission(request: backend_pb.AdmissionRequest, callback: (error: grpc.ServiceError | null, response: backend_pb.ValidationResponse) => void): grpc.ClientUnaryCall;
+  validateAdmission(request: backend_pb.AdmissionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: backend_pb.ValidationResponse) => void): grpc.ClientUnaryCall;
+  validateAdmission(request: backend_pb.AdmissionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: backend_pb.ValidationResponse) => void): grpc.ClientUnaryCall;
+  mutateAdmission(request: backend_pb.AdmissionRequest, callback: (error: grpc.ServiceError | null, response: backend_pb.MutationResponse) => void): grpc.ClientUnaryCall;
+  mutateAdmission(request: backend_pb.AdmissionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: backend_pb.MutationResponse) => void): grpc.ClientUnaryCall;
+  mutateAdmission(request: backend_pb.AdmissionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: backend_pb.MutationResponse) => void): grpc.ClientUnaryCall;
+  convertObject(request: backend_pb.ConversionRequest, callback: (error: grpc.ServiceError | null, response: backend_pb.ConversionResponse) => void): grpc.ClientUnaryCall;
+  convertObject(request: backend_pb.ConversionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: backend_pb.ConversionResponse) => void): grpc.ClientUnaryCall;
+  convertObject(request: backend_pb.ConversionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: backend_pb.ConversionResponse) => void): grpc.ClientUnaryCall;
+}
+
+export class AdmissionControlClient extends grpc.Client implements IAdmissionControlClient {
+  constructor(address: string, credentials: grpc.ChannelCredentials, options?: Partial<grpc.ClientOptions>);
+  public validateAdmission(request: backend_pb.AdmissionRequest, callback: (error: grpc.ServiceError | null, response: backend_pb.ValidationResponse) => void): grpc.ClientUnaryCall;
+  public validateAdmission(request: backend_pb.AdmissionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: backend_pb.ValidationResponse) => void): grpc.ClientUnaryCall;
+  public validateAdmission(request: backend_pb.AdmissionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: backend_pb.ValidationResponse) => void): grpc.ClientUnaryCall;
+  public mutateAdmission(request: backend_pb.AdmissionRequest, callback: (error: grpc.ServiceError | null, response: backend_pb.MutationResponse) => void): grpc.ClientUnaryCall;
+  public mutateAdmission(request: backend_pb.AdmissionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: backend_pb.MutationResponse) => void): grpc.ClientUnaryCall;
+  public mutateAdmission(request: backend_pb.AdmissionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: backend_pb.MutationResponse) => void): grpc.ClientUnaryCall;
+  public convertObject(request: backend_pb.ConversionRequest, callback: (error: grpc.ServiceError | null, response: backend_pb.ConversionResponse) => void): grpc.ClientUnaryCall;
+  public convertObject(request: backend_pb.ConversionRequest, metadata: grpc.Metadata, callback: (error: grpc.ServiceError | null, response: backend_pb.ConversionResponse) => void): grpc.ClientUnaryCall;
+  public convertObject(request: backend_pb.ConversionRequest, metadata: grpc.Metadata, options: Partial<grpc.CallOptions>, callback: (error: grpc.ServiceError | null, response: backend_pb.ConversionResponse) => void): grpc.ClientUnaryCall;
+}
+
