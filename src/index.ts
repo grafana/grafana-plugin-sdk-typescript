@@ -139,9 +139,7 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
 
                     writer.write(
                         tableFromArrays(
-                            dataFrame.fields.filter(field => {
-                                return field.name === 't' || field.name === 'v'
-                            }).reduce((acc, field) => {
+                            dataFrame.fields.reduce((acc, field) => {
                                 acc[field.name] = field.values
 
                                 return acc
@@ -154,7 +152,7 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
                     const frames = await writer.toUint8Array();
                     dataResponse.addFrames(frames);
                     writer.close();
-                    response.getResponsesMap().set('A', dataResponse);
+                    response.getResponsesMap().set(dataFrame.refId, dataResponse);
                 }
             }
         } catch(ex: any) {
