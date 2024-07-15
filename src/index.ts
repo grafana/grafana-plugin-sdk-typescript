@@ -156,59 +156,6 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
 
         try {
             if (pluginContext?.datasourceinstancesettings) {
-                const writer = new RecordBatchFileWriter()
-                const dataResponse: DataResponse = new DataResponse();
-
-                const dataFrames: any[] = await this.QueryData({
-                    ...pluginContext,
-                    targets: queriesList.map(query => {
-                        return {
-                            ...query,
-                            query: query.json,
-                        }
-                    }),
-                });
-
-                dataFrames.forEach((dataFrame) => {
-                    writer.write(
-                        tableFromArrays(
-                            dataFrame.fields.reduce((acc,field) => {
-                                acc[field.name] = field.values;
-
-                                return acc
-                            }, {})
-                        )
-                    );
-                });
-
-                writer.finish();
-                const frames = await writer.toUint8Array();
-                dataResponse.addFrames(frames);
-                writer.close();
-                response.getResponsesMap().set('A', dataResponse);
-            }
-        } catch(ex: any) {
-            console.trace(ex)
-            err = ex;
-        }
-
-        callback(err, response);
-    }
-}
-
-export abstract class MockedDataService<Q,O> implements proto.IDataServer {
-    constructor(request) {
-        this.request = request
-    }
-    abstract QueryData(options: any): Promise<any[]>;
-    async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
-        const {queriesList, pluginContext} = processInputData(this.request)
-        const context: InternalPluginContext.AsObject = this.request.plugincontext!;
-        const response: QueryDataResponse = new QueryDataResponse();
-        let err: grpc.ServiceError | null = null;
-
-        try {
-            if (pluginContext?.datasourceinstancesettings) {
                 const dataFrames: any[] = await this.QueryData({
                     ...pluginContext,
                     targets: queriesList.map(query => {
@@ -226,15 +173,49 @@ export abstract class MockedDataService<Q,O> implements proto.IDataServer {
                     writer.write(
                         tableFromArrays(
                             dataFrame.fields.filter(field => {
-                                return field.name === 't' || field.name === 'count()'
-                            }).reduce((acc,field) => {
-                                acc[field.name] = field.values;
+                                return field.name === 't' || field.name === 'v'
+                            }).reduce((acc, field) => {
+                                if (field.name === 't') {
+                                    acc[field.name] = field.values.map(value => new Date(value))
+                                } else if (field.name === 'v') {
+                                    acc[field.name] = field.values.map(Number)
+                                }
 
                                 return acc
                             }, {})
                         )
                     );
 
+                    // const LENGTH = 100;
+                    //
+                    // const rainAmounts = Float32Array.from(
+                    //     { length: LENGTH },
+                    //     () => Number((Math.random() * 20).toFixed(1)));
+                    // const rainDates = Array.from(
+                    //     { length: LENGTH },
+                    //     (_, i) => new Date(Date.now() - 1000 * 60 * 60 * 24 * i));
+                    //
+                    // const rainfall = tableFromArrays({
+                    //     precipitation: rainAmounts,
+                    //     date: rainDates,
+                    // });
+
+                    // writer.write(rainfall)
+                    //
+                    // logger.info('Results', tableFromArrays(
+                    //     dataFrame.fields.filter(field => {
+                    //         return field.name === 't' || field.name === 'v'
+                    //     }).reduce((acc,field) => {
+                    //         acc[field.name] = field.values;
+                    //
+                    //         console.log(field.name, field.values)
+                    //
+                    //         return acc
+                    //     }, {})
+                    // ))
+
+
+                    logger.info()
                     writer.finish();
                     const frames = await writer.toUint8Array();
                     dataResponse.addFrames(frames);
@@ -247,6 +228,7 @@ export abstract class MockedDataService<Q,O> implements proto.IDataServer {
             err = ex;
         }
 
+        logger.info("response", response.toObject());
         callback(err, response);
     }
 }
