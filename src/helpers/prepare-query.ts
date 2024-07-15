@@ -41,7 +41,6 @@ function base64Decode(data: string): any {
 }
 
 export function processInputData(inputData: any) {
-    console.log(inputData, '------>>>>>>>>>')
     const context = inputData.plugincontext;
 
     // Decode the jsondata in datasourceinstancesettings
@@ -49,11 +48,6 @@ export function processInputData(inputData: any) {
 
     // Decode the json field in each query in queriesList
     const decodedQueriesList = inputData.queriesList.map(query => {
-        console.log({
-            ...query,
-            json: base64Decode(query.json)
-        }, '------')
-
         return {
             ...query,
             json: base64Decode(query.json)

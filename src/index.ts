@@ -19,6 +19,8 @@ import * as grpc from '@grpc/grpc-js';
 import { Logger } from './helpers/logging';
 import {RecordBatchFileWriter, tableFromArrays, tableFromJSON, Table} from 'apache-arrow';
 
+const logger = new Logger();
+
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -143,36 +145,31 @@ export interface PluginContext<T> extends InternalPluginContext.AsObject {
 export abstract class DataService<Q,O> implements proto.IDataServer {
     abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<any[]>;
     async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
-        console.log(1)
-        // writeMessage('Query Data 333 '+ call.request.toObject())
         let request: QueryDataRequest.AsObject = call.request.toObject();
 
         const {queriesList, pluginContext} = processInputData(request)
 
-        console.log(2)
 
         const context: InternalPluginContext.AsObject = request.plugincontext!;
         const response: QueryDataResponse = new QueryDataResponse();
         let err: grpc.ServiceError | null = null;
-        console.log(3, request, request.plugincontext?.datasourceinstancesettings)
 
         try {
             if (pluginContext?.datasourceinstancesettings) {
-                for (let query of queriesList) {
-                    const writer = new RecordBatchFileWriter()
-                    const dataResponse: DataResponse = new DataResponse();
-                    console.log(4)
+                const writer = new RecordBatchFileWriter()
+                const dataResponse: DataResponse = new DataResponse();
 
-                    const request =  {
-                        ...query,
-                        query: query.json,
-                    }
-                    console.log(5)
+                const dataFrames: any[] = await this.QueryData({
+                    ...pluginContext,
+                    targets: queriesList.map(query => {
+                        return {
+                            ...query,
+                            query: query.json,
+                        }
+                    }),
+                });
 
-                    const dataFrame: any = await this.QueryData(request, pluginContext);
-
-                    console.log(6)
-
+                dataFrames.forEach((dataFrame) => {
                     writer.write(
                         tableFromArrays(
                             dataFrame.fields.reduce((acc,field) => {
@@ -182,14 +179,13 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
                             }, {})
                         )
                     );
+                });
 
-                    writer.finish();
-                    const frames = await writer.toUint8Array();
-                    dataResponse.addFrames(frames);
-                    writer.close();
-                    response.getResponsesMap().set(query.refid, dataResponse);
-                }
-
+                writer.finish();
+                const frames = await writer.toUint8Array();
+                dataResponse.addFrames(frames);
+                writer.close();
+                response.getResponsesMap().set('A', dataResponse);
             }
         } catch(ex: any) {
             console.trace(ex)
@@ -204,7 +200,7 @@ export abstract class MockedDataService<Q,O> implements proto.IDataServer {
     constructor(request) {
         this.request = request
     }
-    abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<any[]>;
+    abstract QueryData(options: any): Promise<any[]>;
     async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
         const {queriesList, pluginContext} = processInputData(this.request)
         const context: InternalPluginContext.AsObject = this.request.plugincontext!;
@@ -213,19 +209,25 @@ export abstract class MockedDataService<Q,O> implements proto.IDataServer {
 
         try {
             if (pluginContext?.datasourceinstancesettings) {
-                for (let query of queriesList) {
+                const dataFrames: any[] = await this.QueryData({
+                    ...pluginContext,
+                    targets: queriesList.map(query => {
+                        return {
+                            ...query,
+                            query: query.json,
+                        }
+                    }),
+                });
+
+                for (const dataFrame of dataFrames) {
                     const writer = new RecordBatchFileWriter()
                     const dataResponse: DataResponse = new DataResponse();
 
-                    const request =  {
-                        ...query,
-                        query: query.json,
-                    }
-                    const dataFrame: any = await this.QueryData(request, pluginContext);
-
                     writer.write(
                         tableFromArrays(
-                            dataFrame.fields.reduce((acc,field) => {
+                            dataFrame.fields.filter(field => {
+                                return field.name === 't' || field.name === 'count()'
+                            }).reduce((acc,field) => {
                                 acc[field.name] = field.values;
 
                                 return acc
@@ -237,9 +239,8 @@ export abstract class MockedDataService<Q,O> implements proto.IDataServer {
                     const frames = await writer.toUint8Array();
                     dataResponse.addFrames(frames);
                     writer.close();
-                    response.getResponsesMap().set(query.refid, dataResponse);
+                    response.getResponsesMap().set('A', dataResponse);
                 }
-
             }
         } catch(ex: any) {
             console.trace(ex)
@@ -304,7 +305,6 @@ export class BackendServer {
     }
 }
 
-const logger = new Logger();
 grpc.setLogger(logger);
 grpc.setLogVerbosity(grpc.logVerbosity.DEBUG);
 
