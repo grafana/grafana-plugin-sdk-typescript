@@ -1,5 +1,4 @@
-// @ts-nocheck
-function base64Decode(data: string): any {
+function base64Decode(data: string): Object {
     const decodedString = Buffer.from(data, 'base64').toString('utf-8');
     return JSON.parse(decodedString);
 }
@@ -7,18 +6,15 @@ function base64Decode(data: string): any {
 export function processInputData(inputData: any) {
     const context = inputData.plugincontext;
 
-    // Decode the jsondata in datasourceinstancesettings
     const decodedDatasourceJson = context?.datasourceinstancesettings?.jsondata ? base64Decode(context.datasourceinstancesettings.jsondata) : {};
 
-    // Decode the json field in each query in queriesList
-    const decodedQueriesList = inputData.queriesList.map(query => {
+    const decodedQueriesList = inputData.queriesList.map((query: { [key: string]: any, json: string }) => {
         return {
             ...query,
             json: base64Decode(query.json)
         }
     });
 
-    // Construct the pluginContext object
     const pluginContext = {
         ...context,
         datasourceinstancesettings: {

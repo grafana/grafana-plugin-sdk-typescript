@@ -1,5 +1,4 @@
 #!/usr/bin/env node
-// @ts-nocheck
 import * as proto from './proto/backend_grpc_pb';
 import {
     CheckHealthRequest,
@@ -17,7 +16,7 @@ import {
 } from './proto/backend_pb';
 import * as grpc from '@grpc/grpc-js';
 import { Logger } from './helpers/logging';
-import {RecordBatchFileWriter, tableFromArrays, tableFromJSON, Table} from 'apache-arrow';
+import { RecordBatchFileWriter, tableFromArrays } from 'apache-arrow';
 
 const logger = new Logger();
 
@@ -64,6 +63,7 @@ export class ApiConnectionManager {
 
 
 export abstract class DiagnosticsService implements proto.IDiagnosticsServer {
+    [key: string]: any;
     abstract CheckHealth(request: CheckHealthRequest): Promise<CheckHealthResponse>;
     abstract CollectMetrics(request: CollectMetricsRequest): Promise<CollectMetricsResponse>;
 
@@ -110,14 +110,13 @@ export interface PluginContext<T> extends InternalPluginContext.AsObject {
 }
 
 export abstract class DataService<Q,O> implements proto.IDataServer {
+    [key: string]: any;
     abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<any[]>;
     async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
         let request: QueryDataRequest.AsObject = call.request.toObject();
 
         const {queriesList, pluginContext} = processInputData(request)
 
-
-        const context: InternalPluginContext.AsObject = request.plugincontext!;
         const response: QueryDataResponse = new QueryDataResponse();
         let err: any = null;
 
@@ -125,7 +124,7 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
             if (pluginContext?.datasourceinstancesettings) {
                 const dataFrames: any[] = await this.QueryData({
                     ...pluginContext,
-                    targets: queriesList.map(query => {
+                    targets: queriesList.map((query: any) => {
                         return {
                             ...query,
                             query: query.json,
@@ -139,7 +138,7 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
 
                     writer.write(
                         tableFromArrays(
-                            dataFrame.fields.reduce((acc, field) => {
+                            dataFrame.fields.reduce((acc: { [key: string]: any }, field: any) => {
                                 acc[field.name] = field.values
 
                                 return acc
@@ -166,9 +165,10 @@ export abstract class DataService<Q,O> implements proto.IDataServer {
 }
 
 export abstract class ResourceService implements proto.IResourceService {
+    [key: string]: any;
     abstract CallResource(request: CallResourceRequest): Promise<CallResourceResponse>;
 
-    callResource: grpc.handleServerStreamingCall<CallResourceRequest, CallResourceResponse> = async (call: grpc.ServerWritableStream<CallResourceRequest, CallResourceResponse>) => {
+    callResource: any = async (call: grpc.ServerWritableStream<CallResourceRequest, CallResourceResponse>) => {
         let response: CallResourceResponse = new CallResourceResponse();
         let err: any = null;
 
@@ -195,7 +195,6 @@ export abstract class ResourceService implements proto.IResourceService {
 
 export class BackendServer {
     server: grpc.Server;
-    port: number;
     constructor() {
         this.server = new grpc.Server();
     }

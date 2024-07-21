@@ -1,14 +1,13 @@
-// @ts-nocheck
 import { BackendSrv, BackendSrvRequest, BackendSrvResponse } from './backend_srv';
-// import requestPromise from 'request-promise-native';
 import { DataSourceInstanceSettings } from '../index';
 import { Logger } from '../helpers/logging';
 
 const logger: Logger = new Logger();
 
 const serializeQueryStringParams = function(obj: any, prefix?: string): string {
-  var str = [],
-    p;
+  const str = []
+  let p;
+
   for (p in obj) {
     if (obj.hasOwnProperty(p)) {
       var k = prefix ? prefix + "[" + p + "]" : p,
@@ -84,7 +83,6 @@ export class BackendSrvImpl implements BackendSrv {
    * @returns Promise for a DataQueryResponse
    */
   datasourceRequest<T>(request: BackendSrvRequest<T>): Promise<BackendSrvResponse<T>> {
-    //logger.debug("==>", request);
     request.headers = this.headers;
     if (request.params) {
       const params = serializeQueryStringParams(request.params);
