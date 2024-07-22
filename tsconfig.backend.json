@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
+    "module": "ESNext",
     "target": "ES6",
-    "module": "commonjs",
+    "moduleResolution": "node",
     "sourceMap": true,
-    "rootDir": "pkg",
+    "rootDir": "src",
     "outDir": "dist",
     "experimentalDecorators": true,
     "emitDecoratorMetadata": true,
     "esModuleInterop": true,
     "typeRoots": ["node_modules/@types", "types"]
   },
-  "exclude": ["dist", "node_modules"],
-  "extends": "@grafana/tsconfig",
-  "include": ["pkg/**/*.ts*"]
+  "exclude": ["dist", "node_modules/**"],
+  "include": ["src/**/*.ts*"]
 }

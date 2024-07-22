@@ -1,14 +1,13 @@
-import { DataSourceJsonData } from '@grafana/data';
-import { BackendSrv, BackendSrvRequest, BackendSrvResponse } from '../backend_srv';
-import requestPromise from 'request-promise-native';
+import { BackendSrv, BackendSrvRequest, BackendSrvResponse } from './backend_srv';
 import { DataSourceInstanceSettings } from '../index';
-import { Logger } from '../logging';
+import { Logger } from '../helpers/logging';
 
 const logger: Logger = new Logger();
 
 const serializeQueryStringParams = function(obj: any, prefix?: string): string {
-  var str = [],
-    p;
+  const str = []
+  let p;
+
   for (p in obj) {
     if (obj.hasOwnProperty(p)) {
       var k = prefix ? prefix + "[" + p + "]" : p,
@@ -27,7 +26,7 @@ const serializeQueryStringParams = function(obj: any, prefix?: string): string {
  * online data sources.
  */
 export class BackendSrvImpl implements BackendSrv {
-  config: DataSourceInstanceSettings<DataSourceJsonData>;
+  config: DataSourceInstanceSettings<any>;
   _headers: any;
 
   /**
@@ -35,7 +34,7 @@ export class BackendSrvImpl implements BackendSrv {
    * @param config A Settings object thta includes both Secure and Insecure settings.
    * @todo Figure out a way to keep the secure options secure, rather than hard coding them. Perhaps from the command line?
    */
-  constructor(config: DataSourceInstanceSettings<DataSourceJsonData>, headers?: any) {
+  constructor(config: DataSourceInstanceSettings<any>, headers?: any) {
     this.config = config;
     this._headers = headers || {};
 
@@ -84,25 +83,26 @@ export class BackendSrvImpl implements BackendSrv {
    * @returns Promise for a DataQueryResponse
    */
   datasourceRequest<T>(request: BackendSrvRequest<T>): Promise<BackendSrvResponse<T>> {
-    //logger.debug("==>", request);
     request.headers = this.headers;
     if (request.params) {
       const params = serializeQueryStringParams(request.params);
       request.url += `?${params}`;
     }
-    
-    return requestPromise(request).then(response => {
-      try {
-        //logger.debug("<==", response);
-        let data = response; 
-        if (request.body instanceof Object) {
-          data = JSON.parse(response);
-        }
-        
-        return Promise.resolve({ data });
-      } catch(ex) {
-        return Promise.reject(ex);
-      }
-    });
+
+    // @ts-ignore
+    return Promise.resolve({ data: {} });
+    // return requestPromise(request).then(response => {
+    //   try {
+    //     //logger.debug("<==", response);
+    //     let data = response;
+    //     if (request.body instanceof Object) {
+    //       data = JSON.parse(response);
+    //     }
+    //
+    //     return Promise.resolve({ data });
+    //   } catch(ex) {
+    //     return Promise.reject(ex);
+    //   }
+    // });
   }
 }

@@ -1,229 +1,233 @@
 #!/usr/bin/env node
-
-import { DataFrame, grafanaDataFrameToArrowTable, FieldType, ArrayVector, DateTime } from '@grafana/data';
 import * as proto from './proto/backend_grpc_pb';
 import {
-  CheckHealthRequest,
-  CheckHealthResponse,
-  QueryDataRequest,
-  QueryDataResponse,
-  DataSourceInstanceSettings as InternalDataSourceInstanceSettings,
-  CollectMetricsRequest,
-  CollectMetricsResponse,
-  CallResourceRequest,
-  CallResourceResponse,
-  DataResponse,
-  DataQuery as InternalDataQuery,
-  PluginContext as InternalPluginContext,
+    CheckHealthRequest,
+    CheckHealthResponse,
+    QueryDataRequest,
+    QueryDataResponse,
+    DataSourceInstanceSettings as InternalDataSourceInstanceSettings,
+    CollectMetricsRequest,
+    CollectMetricsResponse,
+    CallResourceRequest,
+    CallResourceResponse,
+    DataResponse,
+    DataQuery as InternalDataQuery,
+    PluginContext as InternalPluginContext,
 } from './proto/backend_pb';
-import * as grpc from 'grpc';
-import { Logger } from './logging';
-import { API } from './api';
-import { RecordBatchFileWriter } from 'apache-arrow';
+import * as grpc from '@grpc/grpc-js';
+import { Logger } from './helpers/logging';
+import { RecordBatchFileWriter, tableFromArrays } from 'apache-arrow';
 
+const logger = new Logger();
+
+export class API {
+    constructor(settings: DataSourceInstanceSettings<any>) {
+
+    }
+
+    public testDatasource(): any {
+        throw "Not implemented Yet..."
+    }
+}
 
 export {
-  CheckHealthRequest,
-  CheckHealthResponse,
-  QueryDataRequest,
-  QueryDataResponse,
-  CollectMetricsRequest,
-  CollectMetricsResponse,
-  CallResourceRequest,
-  CallResourceResponse,
-  DataResponse,
+    CheckHealthRequest,
+    CheckHealthResponse,
+    QueryDataRequest,
+    QueryDataResponse,
+    CollectMetricsRequest,
+    CollectMetricsResponse,
+    CallResourceRequest,
+    CallResourceResponse,
+    DataResponse,
 } from './proto/backend_pb';
 
 import { BackendSrvImpl } from './services/BackendSrvImpl';
+import {processInputData} from "./helpers/prepare-query";
 export { BackendSrvImpl }
 
 export class ApiConnectionManager {
-  apiMap: Record<string, API>;
-  constructor() {
-    this.apiMap = {}
-  }
-
-  getAPI(settings: InternalDataSourceInstanceSettings.AsObject): API {
-    if (!this.apiMap[settings.url]) {
-      this.apiMap[settings.url] = new API(settings);
+    apiMap: Record<string, API>;
+    constructor() {
+        this.apiMap = {}
     }
 
-    return this.apiMap[settings.url];
-  }
+    getAPI(settings: any): API {
+        if (!this.apiMap[settings.url]) {
+            this.apiMap[settings.url] = new API(settings);
+        }
+
+        return this.apiMap[settings.url];
+    }
 }
 
 
 export abstract class DiagnosticsService implements proto.IDiagnosticsServer {
-  abstract CheckHealth(request: CheckHealthRequest): Promise<CheckHealthResponse>;
-  abstract CollectMetrics(request: CollectMetricsRequest): Promise<CollectMetricsResponse>;
-  
-  checkHealth = async (call: grpc.ServerUnaryCall<CheckHealthRequest>, callback: grpc.sendUnaryData<CheckHealthResponse>) => {
-    let response: CheckHealthResponse = new CheckHealthResponse();
-    let err: grpc.ServiceError | null = null;
+    [key: string]: any;
+    abstract CheckHealth(request: CheckHealthRequest): Promise<CheckHealthResponse>;
+    abstract CollectMetrics(request: CollectMetricsRequest): Promise<CollectMetricsResponse>;
 
-    try {
-      response = await this.CheckHealth(call.request);
-    } catch(ex) {
-      logger.warn("exception", ex);
-      response.setStatus(CheckHealthResponse.HealthStatus.ERROR);
-      response.setMessage(ex);
-      err = ex;
+    checkHealth = async (call: grpc.ServerUnaryCall<CheckHealthRequest, CheckHealthResponse>, callback: grpc.sendUnaryData<CheckHealthResponse>) => {
+        let response: CheckHealthResponse = new CheckHealthResponse();
+        let err: any = null;
+
+        try {
+            response = await this.CheckHealth(call.request);
+        } catch(ex: any) {
+            logger.warn("exception", ex);
+            response.setStatus(CheckHealthResponse.HealthStatus.ERROR);
+            response.setMessage(ex as string);
+            err = ex;
+        }
+
+        callback(err, response);
     }
 
-    callback(err, response);
-  }
+    collectMetrics = async (call: grpc.ServerUnaryCall<CollectMetricsRequest, CollectMetricsResponse>, callback: grpc.sendUnaryData<CollectMetricsResponse>) => {
+        let response: CollectMetricsResponse = new CollectMetricsResponse();
+        let err: any = null;
 
-  collectMetrics = async (call: grpc.ServerUnaryCall<CollectMetricsRequest>, callback: grpc.sendUnaryData<CollectMetricsResponse>) => {
-    let response: CollectMetricsResponse = new CollectMetricsResponse();
-    let err: grpc.ServiceError | null = null;
-    
-    try {
-      response = await this.CollectMetrics(call.request);
-    } catch (ex) {
-      logger.warn("exception", ex);
-      err = ex;
-    }
-    callback(err, response);    
-  };
+        try {
+            response = await this.CollectMetrics(call.request);
+        } catch (ex: any) {
+            logger.warn("exception", ex);
+            err = ex;
+        }
+        callback(err, response);
+    };
 }
 
 export interface DataQuery<T> extends InternalDataQuery.AsObject {
-  query: T;
+    query: T;
 }
 
 export interface DataSourceInstanceSettings<T> extends InternalDataSourceInstanceSettings.AsObject {
-  json: T;
+    json: T;
 }
 
 export interface PluginContext<T> extends InternalPluginContext.AsObject {
-  datasourceinstancesettings?: DataSourceInstanceSettings<T>;
+    datasourceinstancesettings?: DataSourceInstanceSettings<T>;
 }
 
 export abstract class DataService<Q,O> implements proto.IDataServer {
-  abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<DataFrame[]>;
+    [key: string]: any;
+    abstract QueryData(request: DataQuery<Q>, pluginContext?: PluginContext<O>): Promise<any[]>;
+    async queryData(call: grpc.ServerUnaryCall<QueryDataRequest, QueryDataResponse>, callback: grpc.sendUnaryData<QueryDataResponse>) {
+        let request: QueryDataRequest.AsObject = call.request.toObject();
 
-  async queryData(call: grpc.ServerUnaryCall<QueryDataRequest>, callback: grpc.sendUnaryData<QueryDataResponse>) {
-    const request: QueryDataRequest.AsObject = call.request.toObject();
-    const context: InternalPluginContext.AsObject = call.request.toObject().plugincontext!;
-    const response: QueryDataResponse = new QueryDataResponse();
-    let err: grpc.ServiceError | null = null;
+        const {queriesList, pluginContext} = processInputData(request)
 
-    try {
-      if (request.plugincontext?.datasourceinstancesettings) {
-        for (let query of request.queriesList) {
-          const dataResponse: DataResponse = new DataResponse();
-          const jsonString: string = Buffer.from(query.json as string, 'base64').toString('ascii');
-          const queryAsQ: Q = JSON.parse(jsonString);
-          const contextJson: string = Buffer.from(context.datasourceinstancesettings?.jsondata as string, 'base64').toString('ascii');
-          const contextAsO: O = JSON.parse(contextJson);
-          const dataFrames: DataFrame[] = await this.QueryData({
-            ...query,
-            query: queryAsQ,
-          }, {
-            ...context,
-            datasourceinstancesettings: {
-              ...context.datasourceinstancesettings!,
-              json: contextAsO,
-            }
-          });
+        const response: QueryDataResponse = new QueryDataResponse();
+        let err: any = null;
 
-          const writer = new RecordBatchFileWriter()
-          dataFrames.forEach((dataFrame: DataFrame) => {
-            const newFields = dataFrame.fields.map(field => {
-              if (field.type == FieldType.time) {
-                return {
-                  ...field,
-                  values: new ArrayVector(field.values.toArray().map((value: DateTime) => value.valueOf() * 1000)),
+        try {
+            if (pluginContext?.datasourceinstancesettings) {
+                const dataFrames: any[] = await this.QueryData({
+                    ...pluginContext,
+                    targets: queriesList.map((query: any) => {
+                        return {
+                            ...query,
+                            query: query.json,
+                        }
+                    }),
+                });
+
+                for (const dataFrame of dataFrames) {
+                    const writer = new RecordBatchFileWriter()
+                    const dataResponse: DataResponse = new DataResponse();
+
+                    writer.write(
+                        tableFromArrays(
+                            dataFrame.fields.reduce((acc: { [key: string]: any }, field: any) => {
+                                acc[field.name] = field.values
+
+                                return acc
+                            }, {})
+                        )
+                    );
+
+                    writer.finish();
+                    const frames = await writer.toUint8Array();
+                    dataResponse.addFrames(frames);
+                    writer.close();
+                    response.getResponsesMap().set(dataFrame.refId, dataResponse);
                 }
-              }
-              return field;
-            });
-            const newDataFrame = {
-              ...dataFrame,
-              fields: newFields,
-            };
-            const table = grafanaDataFrameToArrowTable(newDataFrame);
-            writer.write(table);
-          });
+            }
+        } catch(ex: any) {
+            logger.error("QueryData exception", ex);
 
-          writer.finish();
-          const frames = await writer.toUint8Array();
-          dataResponse.addFrames(frames);
-          writer.close();
-
-          response.getResponsesMap().set(query.refid, dataResponse);
+            err = ex;
         }
-        
-      }
-    } catch(ex) {
-      logger.error("Query data exception", ex);
-      err = ex;
-    }
 
-    callback(err, response);
-  }
+        callback(err, response);
+    }
 }
 
-export abstract class ResourceService implements proto.IResourceServer {
-  abstract CallResource(request: CallResourceRequest): Promise<CallResourceResponse>;
+export abstract class ResourceService implements proto.IResourceService {
+    [key: string]: any;
+    abstract CallResource(request: CallResourceRequest): Promise<CallResourceResponse>;
 
-  callResource: grpc.handleServerStreamingCall<CallResourceRequest, CallResourceResponse> = async (call: grpc.ServerWritableStream<CallResourceRequest>) => {
-    let response: CallResourceResponse = new CallResourceResponse();
-    let err: grpc.ServiceError | null = null;
+    callResource: any = async (call: grpc.ServerWritableStream<CallResourceRequest, CallResourceResponse>) => {
+        let response: CallResourceResponse = new CallResourceResponse();
+        let err: any = null;
 
-    try {
-      response = await this.CallResource(call.request);
-    } catch(ex) {
-      logger.error("CallResource exception", ex);
-      err = ex;
+        try {
+            response = await this.CallResource(call.request);
+        } catch(ex: any) {
+            logger.error("CallResource exception", ex);
+            err = ex;
+        }
+
+        call.write(response, (writeErr: any) => {
+            if (err) {
+                logger.error('error', err);
+                call.emit('error', err)
+            }
+            if (writeErr) {
+                logger.error('write error', writeErr);
+                call.emit('write error', writeErr);
+            }
+            call.end()
+        });
     }
-
-    call.write(response, writeErr => {
-      if (err) {
-        logger.error('error', err);
-        call.emit('error', err)
-      }
-      if (writeErr) {
-        logger.error('write error', writeErr);
-        call.emit('write error', writeErr);
-      }
-      call.end()
-    });
-  }
 }
 
 export class BackendServer {
-  server: grpc.Server;
-  port: number;
-  constructor() {
-    this.server = new grpc.Server();
-    this.port = this.server.bind('0.0.0.0:0', grpc.ServerCredentials.createInsecure());
-  }
+    server: grpc.Server;
+    constructor() {
+        this.server = new grpc.Server();
+    }
 
-  public addDiagnosticsService = (instance: proto.IDiagnosticsServer) => {
-    this.server.addService(proto.DiagnosticsService, instance);  
-  }
+    public addDiagnosticsService = (instance: any) => {
+        this.server.addService(proto.DiagnosticsService as any, instance as any);
+    }
 
-  public addResourceService = (instance: proto.IResourceServer) => {
-    this.server.addService(proto.ResourceService, instance);
-  }
+    public addResourceService = (instance: any) => {
+        this.server.addService(proto.ResourceService as any, instance as any);
+    }
 
-  public addDataService = (instance: proto.IDataServer) => {
-    this.server.addService(proto.DataService, instance);
-  }
-  
-  public run() {
-    this.server.start();
-    console.log(`1|2|tcp|localhost:${this.port}|grpc`);
-  }
+    public addDataService = (instance: any) => {
+        this.server.addService(proto.DataService as any, instance as any);
+    }
+
+    public run() {
+        this.server.bindAsync('0.0.0.0:0', grpc.ServerCredentials.createInsecure(), (error, port) => {
+            if (error) {
+                logger.error('error', error);
+                return;
+            }
+
+            console.log(`1|2|tcp|localhost:${port}|grpc`);
+            logger.info(`Server running on)
+        })
+    }
 }
 
-const logger = new Logger();
-grpc.setLogger(logger);
-grpc.setLogVerbosity(grpc.logVerbosity.INFO);  
+grpc.setLogVerbosity(grpc.logVerbosity.DEBUG);
+
 
 export {
-  logger,
-  Logger,
-  DataFrame,
+    logger,
+    Logger
 }
+
